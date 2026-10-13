@@ -30,11 +30,11 @@
       <div class="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none"></div>
 
       <div>
-        <!-- Logo en versión negativa -->
+        <!-- Logo en versión negativa (sin bordes) -->
         <div class="flex items-center gap-3 mb-12">
-          <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" alt="Logo ECOPRAXIS" class="w-12 h-12 object-cover rounded-xl shadow-lg border border-white/10">
+          <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" alt="Logo ECOPRAXIS" class="w-12 h-12 object-contain">
           <div>
-            <h1 class="text-xl font-black tracking-wider">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+            <h1 class="text-xl font-black tracking-wider text-white">ECO<span style="color: #1f99e0ff;">PRAXIS</span></h1>
             <p class="text-[9px] tracking-widest uppercase text-slate-300">Ecografía Práctica</p>
           </div>
         </div>
@@ -46,13 +46,13 @@
 
         <ul class="space-y-3 text-xs md:text-sm text-slate-200">
           <li class="flex items-center gap-2">
-            <span class="text-ecopraxBlue font-bold">✓</span> Generación instantánea de informes en PDF
+            <span style="color: #1f99e0ff;" class="font-bold">✓</span> Generación instantánea de informes en PDF
           </li>
           <li class="flex items-center gap-2">
-            <span class="text-ecopraxBlue font-bold">✓</span> Firma digital con transparencia automática y sello profesional
+            <span style="color: #1f99e0ff;" class="font-bold">✓</span> Firma digital con transparencia automática y sello profesional
           </li>
           <li class="flex items-center gap-2">
-            <span class="text-ecopraxBlue font-bold">✓</span> Acceso seguro desde cualquier PC o dispositivo móvil
+            <span style="color: #1f99e0ff;" class="font-bold">✓</span> Acceso seguro desde cualquier PC o dispositivo móvil
           </li>
         </ul>
       </div>
@@ -95,9 +95,9 @@
     
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6 gap-4">
       <div class="flex items-center gap-3">
-        <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" alt="Logo" class="w-10 h-10 object-cover rounded-lg shadow">
+        <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" alt="Logo" class="w-10 h-10 object-contain">
         <div>
-          <h1 class="text-2xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+          <h1 class="text-2xl font-black tracking-tight"><span style="color: #042050ff;">ECO</span><span style="color: #0152a7ff;">PRAXIS</span></h1>
           <p class="text-xs text-slate-500">Sesión de: <span id="user-email-display" class="font-semibold text-ecopraxBlue"></span></p>
         </div>
       </div>
@@ -230,9 +230,9 @@
       <div id="planilla-imprimible">
         <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
           <div class="flex items-center gap-2">
-            <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS%20NEGATIVO.jpg" alt="Logo" class="w-8 h-8 object-cover rounded">
+            <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" alt="Logo" class="w-8 h-8 object-contain">
             <div>
-              <h1 class="text-xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+              <h1 class="text-xl font-black tracking-tight"><span style="color: #042050ff;">ECO</span><span style="color: #0152a7ff;">PRAXIS</span></h1>
               <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
             </div>
           </div>
@@ -575,3 +575,4 @@
     });
   </script>
 </body>
+</html>
