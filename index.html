@@ -1321,20 +1321,49 @@
       document.execCommand(command, false, null);
     }
 
-    window.cambiarCasoCustom = function(idEditor, selectElem) {
-      const opcion = selectElem.value;
-      const editor = document.getElementById(idEditor);
-      editor.focus();
-      const seleccion = window.getSelection();
-      if (seleccion.rangeCount > 0 && !seleccion.isCollapsed) {
-        const rango = seleccion.getRangeAt(0);
-        const texto = rango.toString();
-        rango.deleteContents();
-        rango.insertNode(document.createTextNode(opcion === 'mayus' ? texto.toUpperCase() : texto.toLowerCase()));
+   window.cambiarCasoCustom = function(idEditor, selectElem) {
+  const opcion = selectElem.value;
+  const editor = document.getElementById(idEditor);
+  editor.focus();
+  
+  const seleccion = window.getSelection();
+  
+  if (seleccion.rangeCount > 0 && !seleccion.isCollapsed) {
+    const rango = seleccion.getRangeAt(0);
+    
+    // Función recursiva para transformar texto dentro de cualquier nodo respetando la estructura HTML (<li>, <b>, <i>, etc.)
+    function transformarNodosTexto(nodo) {
+      if (nodo.nodeType === Node.TEXT_NODE) {
+        nodo.nodeValue = opcion === 'mayus' ? nodo.nodeValue.toUpperCase() : nodo.nodeValue.toLowerCase();
+      } else {
+        for (let child of nodo.childNodes) {
+          transformarNodosTexto(child);
+        }
       }
-      selectElem.selectedIndex = 0;
     }
 
+    // Si la selección abarca varios elementos, procesamos el fragmento
+    const fragmento = rango.cloneContents();
+    transformarNodosTexto(fragmento);
+    
+    rango.deleteContents();
+    rango.insertNode(fragmento);
+  } else {
+    // Si no hay texto seleccionado explícitamente, transforma todo el contenido del editor respetando las etiquetas
+    function transformarTodoHtml(nodo) {
+      if (nodo.nodeType === Node.TEXT_NODE) {
+        nodo.nodeValue = opcion === 'mayus' ? nodo.nodeValue.toUpperCase() : nodo.nodeValue.toLowerCase();
+      } else {
+        for (let child of nodo.childNodes) {
+          transformarTodoHtml(child);
+        }
+      }
+    }
+    transformarTodoHtml(editor);
+  }
+
+  selectElem.selectedIndex = 0;
+}
     // AUTH & SETUP
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('link-to-register')?.addEventListener('click', () => {
