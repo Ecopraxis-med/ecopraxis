@@ -211,32 +211,35 @@
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Hallazgos</h2>
         
-        <!-- Barra de herramientas visual -->
-        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-          <button type="button" onclick="ejecutarComando('bold')" class="px-2.5 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
-          <button type="button" onclick="ejecutarComando('italic')" class="px-2.5 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>C</i></button>
-          <button type="button" onclick="ejecutarComando('insertUnorderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Viñeta con punto">• Viñeta</button>
-          <button type="button" onclick="ejecutarComando('insertOrderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Lista numerada">1. Lista</button>
+        <!-- Barra de herramientas con símbolos estándar estilo Word -->
+        <div class="flex items-center flex-wrap gap-1 bg-slate-100 p-1 rounded-lg border">
+          <button type="button" onclick="ejecutarComando('bold')" class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="ejecutarComando('italic')" class="w-8 h-8 flex items-center justify-center text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>K</i></button>
+          <button type="button" onclick="ejecutarComando('insertUnorderedList')" class="w-8 h-8 flex items-center justify-center text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm font-bold" title="Viñetas">☰•</button>
+          <button type="button" onclick="ejecutarComando('insertOrderedList')" class="w-8 h-8 flex items-center justify-center text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm font-bold" title="Lista Numerada">1.≡</button>
+          <button type="button" onclick="convertirMayusculas('hallazgos-texto')" class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm text-ecopraxBlue" title="Convertir a Mayúsculas">AA</button>
         </div>
 
         <button id="btn-restablecer" class="text-xs font-semibold text-ecopraxBlue hover:underline cursor-pointer">Restablecer Plantilla</button>
       </div>
-      <!-- Div editable (contenteditable) para permitir formato visual directo y enter automático en listas -->
       <div id="hallazgos-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></div>
     </section>
 
     <!-- CONCLUSIÓN CON EDITOR ENRIQUECIDO -->
     <section class="mb-6">
-      <div class="flex justify-between items-center mb-2">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Conclusión Diagnóstica</h2>
         
-        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-          <button type="button" onclick="ejecutarComandoConclusion('bold')" class="px-2.5 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
-          <button type="button" onclick="ejecutarComandoConclusion('italic')" class="px-2.5 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>C</i></button>
-          <button type="button" onclick="ejecutarComandoConclusion('insertUnorderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Viñeta">• Viñeta</button>
+        <!-- Barra de herramientas idéntica y limpia -->
+        <div class="flex items-center flex-wrap gap-1 bg-slate-100 p-1 rounded-lg border">
+          <button type="button" onclick="ejecutarComandoConclusion('bold')" class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="ejecutarComandoConclusion('italic')" class="w-8 h-8 flex items-center justify-center text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>K</i></button>
+          <button type="button" onclick="ejecutarComandoConclusion('insertUnorderedList')" class="w-8 h-8 flex items-center justify-center text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm font-bold" title="Viñetas">☰•</button>
+          <button type="button" onclick="ejecutarComandoConclusion('insertOrderedList')" class="w-8 h-8 flex items-center justify-center text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm font-bold" title="Lista Numerada">1.≡</button>
+          <button type="button" onclick="convertirMayusculas('conclusion-texto')" class="w-8 h-8 flex items-center justify-center text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm text-ecopraxBlue" title="Convertir a Mayúsculas">AA</button>
         </div>
       </div>
-      <div id="conclusion-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue" style="min-height: 90px;"></div>
+      <div id="conclusion-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue" style="min-height: 110px;"></div>
     </section>
 
     <!-- BOTÓN DE GENERAR -->
@@ -336,7 +339,7 @@
       }
     };
 
-    // Funciones para aplicar formato visual instantáneo
+    // Funciones de formato visual
     window.ejecutarComando = function(command) {
       document.getElementById('hallazgos-texto').focus();
       document.execCommand(command, false, null);
@@ -345,6 +348,24 @@
     window.ejecutarComandoConclusion = function(command) {
       document.getElementById('conclusion-texto').focus();
       document.execCommand(command, false, null);
+    }
+
+    // Función para convertir texto seleccionado a MAYÚSCULAS
+    window.convertirMayusculas = function(idElemento) {
+      const editor = document.getElementById(idElemento);
+      editor.focus();
+      const seleccion = window.getSelection();
+      if (!seleccion.rangeCount) return;
+      const rango = seleccion.getRangeAt(0);
+      const textoSeleccionado = rango.toString();
+      
+      if (textoSeleccionado) {
+        const textoMayus = textoSeleccionado.toUpperCase();
+        rango.deleteContents();
+        rango.insertNode(document.createTextNode(textoMayus));
+      } else {
+        editor.innerHTML = editor.innerHTML.toUpperCase();
+      }
     }
 
     function cargarPlantilla() {
@@ -544,7 +565,6 @@
       const select = document.getElementById('select-estudio');
       const estudio = select.options[select.selectedIndex].text;
       
-      // Obtener el HTML directamente del editor enriquecido
       const hallazgos = document.getElementById('hallazgos-texto').innerHTML;
       const conclusion = document.getElementById('conclusion-texto').innerHTML;
 
@@ -554,7 +574,6 @@
       document.getElementById('pdf-fecha').innerText = fecha;
       document.getElementById('pdf-estudio').innerText = estudio;
       
-      // Asignar al PDF manteniendo los formatos visuales, viñetas y listas
       document.getElementById('pdf-hallazgos').innerHTML = hallazgos;
       document.getElementById('pdf-conclusion').innerHTML = conclusion;
 
