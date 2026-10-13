@@ -18,214 +18,6 @@
       }
     }
   </script>
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // ⚠️ MANTÉN AQUÍ TUS CREDENCIALES REALES DE FIREBASE
-    const firebaseConfig = {
-      apiKey: "AIzaSyBDWqtkoFIjwnfmvxEb7e1jNxyko43FRVc",
-  authDomain: "ecopraxis-d12fd.firebaseapp.com",
-  projectId: "ecopraxis-d12fd",
-  storageBucket: "ecopraxis-d12fd.firebasestorage.app",
-  messagingSenderId: "242952378160",
-  appId: "1:242952378160:web:aed47838b8b71dfe731af5",
-  measurementId: "G-RFF4R8Y6EP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let medicoActualDatos = {
-      selloUrl: '',
-      firmaUrl: ''
-    };
-
-    window.registrarUsuario = async function() {
-      const email = document.getElementById('auth-email').value.trim();
-      const pass = document.getElementById('auth-pass').value;
-
-      if (!email) {
-        alert("Por favor, ingresa un correo electrónico válido.");
-        return;
-      }
-
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        alert("¡Registro exitoso en ECOPRAXIS!");
-      } catch (error) {
-        alert("Error al registrarse: " + error.message);
-      }
-    };
-
-    window.iniciarSesion = async function() {
-      const email = document.getElementById('auth-email').value.trim();
-      const pass = document.getElementById('auth-pass').value;
-
-      if (!email) {
-        alert("Por favor, ingresa tu correo electrónico.");
-        return;
-      }
-
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-      } catch (error) {
-        alert("Error al iniciar sesión: " + error.message);
-      }
-    };
-
-    window.cerrarSesion = async function() {
-      await signOut(auth);
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('app-section').classList.remove('hidden');
-        document.getElementById('user-email-display').innerText = user.email;
-        
-        const docRef = doc(db, "medicos", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          medicoActualDatos = docSnap.data();
-          document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
-          document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
-          
-          if (medicoActualDatos.tieneColegiado) {
-            document.getElementById('check-colegiado').checked = true;
-            document.getElementById('container-cmv').classList.remove('hidden');
-            document.getElementById('med-cmv').value = medicoActualDatos.cmv || '';
-          } else {
-            document.getElementById('check-colegiado').checked = false;
-            document.getElementById('container-cmv').classList.add('hidden');
-            document.getElementById('med-cmv').value = '';
-          }
-
-          if (medicoActualDatos.selloUrl) {
-            document.getElementById('preview-sello').src = medicoActualDatos.selloUrl;
-            document.getElementById('preview-sello').classList.remove('hidden');
-          }
-          if (medicoActualDatos.firmaUrl) {
-            document.getElementById('preview-firma').src = medicoActualDatos.firmaUrl;
-            document.getElementById('preview-firma').classList.remove('hidden');
-          }
-        }
-      } else {
-        document.getElementById('auth-section').classList.remove('hidden');
-        document.getElementById('app-section').classList.add('hidden');
-      }
-    });
-
-    window.toggleColegiado = function() {
-      const isChecked = document.getElementById('check-colegiado').checked;
-      const container = document.getElementById('container-cmv');
-      if (isChecked) {
-        container.classList.remove('hidden');
-      } else {
-        container.classList.add('hidden');
-        document.getElementById('med-cmv').value = '';
-      }
-    };
-
-    window.procesarSello = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        medicoActualDatos.selloUrl = e.target.result;
-        const imgPreview = document.getElementById('preview-sello');
-        imgPreview.src = e.target.result;
-        imgPreview.classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    };
-
-    window.procesarFirma = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0);
-
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = imgData.data;
-
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-            if (r > 200 && g > 200 && b > 200) {
-              data[i + 3] = 0;
-            }
-          }
-
-          ctx.putImageData(imgData, 0, 0);
-          const transparenteBase64 = canvas.toDataURL('image/png');
-
-          medicoActualDatos.firmaUrl = transparenteBase64;
-          const imgPreview = document.getElementById('preview-firma');
-          imgPreview.src = transparenteBase64;
-          imgPreview.classList.remove('hidden');
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    };
-
-    window.guardarPerfilMedico = async function() {
-      const user = auth.currentUser;
-      if (!user) return;
-      
-      const tieneColegiado = document.getElementById('check-colegiado').checked;
-
-      medicoActualDatos.nombre = document.getElementById('med-nombre').value;
-      medicoActualDatos.mpps = document.getElementById('med-mpps').value;
-      medicoActualDatos.tieneColegiado = tieneColegiado;
-      medicoActualDatos.cmv = tieneColegiado ? document.getElementById('med-cmv').value : '';
-
-      try {
-        await setDoc(doc(db, "medicos", user.uid), medicoActualDatos);
-        alert("¡Perfil profesional guardado con éxito!");
-      } catch (error) {
-        alert("Error al guardar perfil: " + error.message);
-      }
-    };
-
-    window.guardarExamenEnBD = async function(examen) {
-      const user = auth.currentUser;
-      if (!user) return;
-      try {
-        await addDoc(collection(db, "examenes"), {
-          ...examen,
-          medicoUid: user.uid,
-          medicoNombre: medicoActualDatos.nombre || user.email,
-          fechaServidor: serverTimestamp()
-        });
-      } catch (e) {
-        console.error("Error al guardar en historial: ", e);
-      }
-    };
-  </script>
-
-  <style>
-    @media print {
-      body * { visibility: hidden; }
-      #modal-preview, #modal-preview * { visibility: visible; }
-      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
-      .no-print-modal { display: none !important; }
-    }
-  </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen p-4 md:p-8">
 
@@ -246,8 +38,8 @@
         <input type="password" id="auth-pass" placeholder="••••••••" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
       </div>
       <div class="flex gap-2 pt-2">
-        <button onclick="iniciarSesion()" class="flex-1 bg-ecopraxDark hover:bg-slate-800 text-white font-medium py-3 rounded-xl text-sm transition shadow-md">Iniciar Sesión</button>
-        <button onclick="registrarUsuario()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl text-sm transition">Registrarse</button>
+        <button id="btn-login" class="flex-1 bg-ecopraxDark hover:bg-slate-800 text-white font-medium py-3 rounded-xl text-sm transition shadow-md cursor-pointer">Iniciar Sesión</button>
+        <button id="btn-register" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl text-sm transition cursor-pointer">Registrarse</button>
       </div>
     </div>
   </div>
@@ -260,7 +52,7 @@
         <h1 class="text-2xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
         <p class="text-xs text-slate-500">Sesión de: <span id="user-email-display" class="font-semibold text-ecopraxBlue"></span></p>
       </div>
-      <button onclick="cerrarSesion()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition">Cerrar Sesión</button>
+      <button id="btn-logout" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer">Cerrar Sesión</button>
     </div>
 
     <!-- CONFIGURACIÓN DEL MÉDICO -->
@@ -282,7 +74,7 @@
         <!-- COLEGIADO OPCIONAL -->
         <div class="border p-3 rounded-lg bg-white">
           <label class="flex items-center gap-2 cursor-pointer mb-2">
-            <input type="checkbox" id="check-colegiado" onchange="toggleColegiado()" class="w-4 h-4 text-ecopraxBlue rounded">
+            <input type="checkbox" id="check-colegiado" class="w-4 h-4 text-ecopraxBlue rounded">
             <span class="text-xs font-bold text-slate-700">¿Posee Nro. de Colegiado / C.M.V. (Opcional)?</span>
           </label>
           <div id="container-cmv" class="hidden mt-2">
@@ -295,7 +87,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="border p-3 rounded-xl bg-white text-center">
             <label class="block text-xs font-bold text-slate-700 mb-2">Sello Profesional (Imagen/Foto)</label>
-            <input type="file" id="file-sello" accept="image/*" onchange="procesarSello(event)" class="hidden">
+            <input type="file" id="file-sello" accept="image/*" class="hidden">
             <label for="file-sello" class="cursor-pointer inline-block bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-2 rounded-lg border transition">
               📁 Seleccionar imagen de Sello
             </label>
@@ -306,7 +98,7 @@
 
           <div class="border p-3 rounded-xl bg-white text-center">
             <label class="block text-xs font-bold text-slate-700 mb-2">Firma Digital (Fondo transparente auto)</label>
-            <input type="file" id="file-firma" accept="image/*" onchange="procesarFirma(event)" class="hidden">
+            <input type="file" id="file-firma" accept="image/*" class="hidden">
             <label for="file-firma" class="cursor-pointer inline-block bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-4 py-2 rounded-lg border transition">
               ✍️ Seleccionar imagen de Firma
             </label>
@@ -316,7 +108,7 @@
           </div>
         </div>
 
-        <button onclick="guardarPerfilMedico()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition shadow">Guardar Cambios de Perfil</button>
+        <button id="btn-guardar-perfil" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition shadow cursor-pointer">Guardar Cambios de Perfil</button>
       </div>
     </details>
 
@@ -342,7 +134,7 @@
     <!-- SELECCIÓN DE PLANTILLA -->
     <section class="mb-6">
       <h2 class="text-sm font-bold text-ecopraxDark mb-3 border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Tipo de Estudio Ecográfico</h2>
-      <select id="select-estudio" onchange="cargarPlantilla()" class="w-full p-3 border rounded-xl bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-ecopraxBlue">
+      <select id="select-estudio" class="w-full p-3 border rounded-xl bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-ecopraxBlue">
         <option value="abdominal">Ecografía Abdominal Superior</option>
         <option value="renal">Ecografía Renal y Vesical</option>
         <option value="obstetrica">Ecografía Obstétrica Básica</option>
@@ -353,7 +145,7 @@
     <section class="mb-6">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Hallazgos</h2>
-        <button onclick="cargarPlantilla()" class="text-xs font-semibold text-ecopraxBlue hover:underline">Restablecer Plantilla</button>
+        <button id="btn-restablecer" class="text-xs font-semibold text-ecopraxBlue hover:underline cursor-pointer">Restablecer Plantilla</button>
       </div>
       <textarea id="hallazgos-texto" rows="8" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
     </section>
@@ -366,23 +158,22 @@
 
     <!-- BOTÓN DE GENERAR -->
     <div class="flex justify-end pt-4 border-t">
-      <button onclick="window.generarVistaPrevia()" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm transition shadow-lg flex items-center gap-2 cursor-pointer">
+      <button id="btn-generar-pdf" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm transition shadow-lg flex items-center gap-2 cursor-pointer">
         <span>👁️ Ver Planilla y Generar PDF</span>
       </button>
     </div>
 
   </div>
 
-  <!-- MODAL DE VISTA PREVIA Y PLANILLA FINAL PARA IMPRIMIR -->
+  <!-- MODAL DE VISTA PREVIA -->
   <div id="modal-preview" class="hidden fixed inset-0 bg-slate-900/70 z-50 overflow-y-auto p-4 md:p-10 flex justify-center items-start">
     <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative my-6">
       
-      <!-- Botones de Acción del Modal -->
-      <div class="flex justify-between items-center pb-4 mb-6 border-b no-print-modal">
+      <div class="flex justify-between items-center pb-4 mb-6 border-b">
         <span class="text-xs font-bold text-slate-500 uppercase">Vista Previa de Informe</span>
         <div class="flex gap-2">
-          <button onclick="window.ejecutarImpresion()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow cursor-pointer">🖨️ Imprimir / Guardar PDF</button>
-          <button onclick="window.cerrarVistaPrevia()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg transition cursor-pointer">✕ Cerrar</button>
+          <button id="btn-imprimir" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow cursor-pointer">🖨️ Imprimir / Guardar PDF</button>
+          <button id="btn-cerrar-modal" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg transition cursor-pointer">✕ Cerrar</button>
         </div>
       </div>
 
@@ -418,7 +209,6 @@
           <p id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-mono"></p>
         </div>
 
-        <!-- SELLO Y FIRMA -->
         <div class="flex justify-between items-end mt-16 pt-4">
           <div class="text-center w-40">
             <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
@@ -434,6 +224,16 @@
     </div>
   </div>
 
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #modal-preview, #modal-preview * { visibility: visible; }
+      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
+      #modal-preview button { display: none !important; }
+    }
+  </style>
+
+  <!-- SCRIPT DE LÓGICA DE LA INTERFAZ -->
   <script>
     const plantillas = {
       abdominal: {
@@ -461,13 +261,201 @@
       }
     };
 
-    window.cargarPlantilla = function() {
+    function cargarPlantilla() {
       const tipo = document.getElementById('select-estudio').value;
-      document.getElementById('hallazgos-texto').value = plantillas[tipo].hallazgos;
-      document.getElementById('conclusion-texto').value = plantillas[tipo].conclusion;
+      if (plantillas[tipo]) {
+        document.getElementById('hallazgos-texto').value = plantillas[tipo].hallazgos;
+        document.getElementById('conclusion-texto').value = plantillas[tipo].conclusion;
+      }
     }
 
-    window.generarVistaPrevia = function() {
+    document.getElementById('select-estudio').addEventListener('change', cargarPlantilla);
+    document.getElementById('btn-restablecer').addEventListener('click', (e) => {
+      e.preventDefault();
+      cargarPlantilla();
+    });
+
+    // Checkbox de Colegiado
+    document.getElementById('check-colegiado').addEventListener('change', function() {
+      const container = document.getElementById('container-cmv');
+      if (this.checked) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+        document.getElementById('med-cmv').value = '';
+      }
+    });
+
+    // Cerrar modal
+    document.getElementById('btn-cerrar-modal').addEventListener('click', () => {
+      document.getElementById('modal-preview').classList.add('hidden');
+    });
+
+    // Imprimir / PDF
+    document.getElementById('btn-imprimir').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Cargar plantilla inicial al abrir
+    window.addEventListener('DOMContentLoaded', () => {
+      cargarPlantilla();
+    });
+  </script>
+
+  <!-- SCRIPT DE FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // ⚠️ MANTÉN AQUÍ TUS CREDENCIALES REALES DE FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDWqtkoFIjwnfmvxEb7e1jNxyko43FRVc",
+  authDomain: "ecopraxis-d12fd.firebaseapp.com",
+  projectId: "ecopraxis-d12fd",
+  storageBucket: "ecopraxis-d12fd.firebasestorage.app",
+  messagingSenderId: "242952378160",
+  appId: "1:242952378160:web:aed47838b8b71dfe731af5",
+  measurementId: "G-RFF4R8Y6EP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let medicoActualDatos = { selloUrl: '', firmaUrl: '' };
+
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      if (!email) { alert("Ingresa un correo válido."); return; }
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        alert("¡Registro exitoso en ECOPRAXIS!");
+      } catch (error) {
+        alert("Error al registrarse: " + error.message);
+      }
+    });
+
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      if (!email) { alert("Ingresa tu correo."); return; }
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (error) {
+        alert("Error al iniciar sesión: " + error.message);
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('app-section').classList.remove('hidden');
+        document.getElementById('user-email-display').innerText = user.email;
+        
+        const docRef = doc(db, "medicos", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          medicoActualDatos = docSnap.data();
+          document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
+          document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
+          
+          if (medicoActualDatos.tieneColegiado) {
+            document.getElementById('check-colegiado').checked = true;
+            document.getElementById('container-cmv').classList.remove('hidden');
+            document.getElementById('med-cmv').value = medicoActualDatos.cmv || '';
+          }
+
+          if (medicoActualDatos.selloUrl) {
+            document.getElementById('preview-sello').src = medicoActualDatos.selloUrl;
+            document.getElementById('preview-sello').classList.remove('hidden');
+          }
+          if (medicoActualDatos.firmaUrl) {
+            document.getElementById('preview-firma').src = medicoActualDatos.firmaUrl;
+            document.getElementById('preview-firma').classList.remove('hidden');
+          }
+        }
+      } else {
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('app-section').classList.add('hidden');
+      }
+    });
+
+    // Procesar Sello
+    document.getElementById('file-sello').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        medicoActualDatos.selloUrl = e.target.result;
+        const imgPreview = document.getElementById('preview-sello');
+        imgPreview.src = e.target.result;
+        imgPreview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Procesar Firma (Fondo transparente)
+    document.getElementById('file-firma').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
+              data[i + 3] = 0;
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+          const transparenteBase64 = canvas.toDataURL('image/png');
+
+          medicoActualDatos.firmaUrl = transparenteBase64;
+          const imgPreview = document.getElementById('preview-firma');
+          imgPreview.src = transparenteBase64;
+          imgPreview.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Guardar Perfil
+    document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      const tieneColegiado = document.getElementById('check-colegiado').checked;
+      medicoActualDatos.nombre = document.getElementById('med-nombre').value;
+      medicoActualDatos.mpps = document.getElementById('med-mpps').value;
+      medicoActualDatos.tieneColegiado = tieneColegiado;
+      medicoActualDatos.cmv = tieneColegiado ? document.getElementById('med-cmv').value : '';
+
+      try {
+        await setDoc(doc(db, "medicos", user.uid), medicoActualDatos);
+        alert("¡Perfil profesional guardado con éxito!");
+      } catch (error) {
+        alert("Error al guardar perfil: " + error.message);
+      }
+    });
+
+    // Generar Vista Previa del PDF
+    document.getElementById('btn-generar-pdf').addEventListener('click', async () => {
       const nombre = document.getElementById('paciente-nombre').value || 'N/A';
       const cedula = document.getElementById('paciente-cedula').value || 'N/A';
       const edad = document.getElementById('paciente-edad').value || 'N/A';
@@ -510,34 +498,30 @@
         imgFirma.classList.add('hidden');
       }
 
-      // Guardar automáticamente en Firebase
-      if (window.guardarExamenEnBD) {
-        window.guardarExamenEnBD({
-          pacienteNombre: nombre,
-          pacienteCedula: cedula,
-          pacienteEdad: edad,
-          estudioTipo: estudio,
-          hallazgos: hallazgos,
-          conclusion: conclusion,
-          fechaStr: fecha
-        });
+      // Guardar en historial de Firebase
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await addDoc(collection(db, "examenes"), {
+            pacienteNombre: nombre,
+            pacienteCedula: cedula,
+            pacienteEdad: edad,
+            estudioTipo: estudio,
+            hallazgos: hallazgos,
+            conclusion: conclusion,
+            fechaStr: fecha,
+            medicoUid: user.uid,
+            medicoNombre: medicoActualDatos.nombre || user.email,
+            fechaServidor: serverTimestamp()
+          });
+        } catch (e) {
+          console.error("Error al guardar en historial: ", e);
+        }
       }
 
-      // Mostrar el modal
+      // Mostrar modal
       document.getElementById('modal-preview').classList.remove('hidden');
-    }
-
-    window.cerrarVistaPrevia = function() {
-      document.getElementById('modal-preview').classList.add('hidden');
-    }
-
-    window.ejecutarImpresion = function() {
-      window.print();
-    }
-
-    window.onload = function() {
-      cargarPlantilla();
-    };
+    });
   </script>
 </body>
 </html>
