@@ -745,4 +745,189 @@
             document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
             document.getElementById('user-name-display').innerText = medicoActualDatos.nombre || user.email;
             
-            if
+            if (medicoActualDatos.tieneColegiado) {
+              document.getElementById('check-colegiado').checked = true;
+              document.getElementById('container-cmv').classList.remove('hidden');
+              document.getElementById('med-cmv').value = medicoActualDatos.cmv || '';
+            }
+
+            if (medicoActualDatos.perfilUrl) {
+              const imgPerfil = document.getElementById('preview-perfil');
+              imgPerfil.src = medicoActualDatos.perfilUrl;
+              imgPerfil.classList.remove('hidden');
+            }
+
+            if (medicoActualDatos.selloUrl) {
+              document.getElementById('preview-sello').src = medicoActualDatos.selloUrl;
+              document.getElementById('preview-sello').classList.remove('hidden');
+            }
+            if (medicoActualDatos.firmaUrl) {
+              document.getElementById('preview-firma').src = medicoActualDatos.firmaUrl;
+              document.getElementById('preview-firma').classList.remove('hidden');
+            }
+          }
+        } catch(e) {
+          console.error("Error cargando perfil del médico:", e);
+        }
+      } else {
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('app-section').classList.add('hidden');
+      }
+    });
+
+    // Cambiar Foto de Perfil
+    document.getElementById('file-perfil').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        medicoActualDatos.perfilUrl = e.target.result;
+        const img = document.getElementById('preview-perfil');
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Procesar Sello
+    document.getElementById('file-sello').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        medicoActualDatos.selloUrl = e.target.result;
+        const imgPreview = document.getElementById('preview-sello');
+        imgPreview.src = e.target.result;
+        imgPreview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Procesar Firma (Fondo transparente)
+    document.getElementById('file-firma').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+
+          for (let i = 0; i < data.length; i += 4) {
+            if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
+              data[i + 3] = 0;
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+          const transparenteBase64 = canvas.toDataURL('image/png');
+
+          medicoActualDatos.firmaUrl = transparenteBase64;
+          const imgPreview = document.getElementById('preview-firma');
+          imgPreview.src = transparenteBase64;
+          imgPreview.classList.remove('hidden');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Guardar Perfil
+    document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      const tieneColegiado = document.getElementById('check-colegiado').checked;
+      medicoActualDatos.nombre = document.getElementById('med-nombre').value;
+      medicoActualDatos.mpps = document.getElementById('med-mpps').value;
+      medicoActualDatos.tieneColegiado = tieneColegiado;
+      medicoActualDatos.cmv = tieneColegiado ? document.getElementById('med-cmv').value : '';
+
+      try {
+        await setDoc(doc(db, "medicos", user.uid), medicoActualDatos);
+        alert("¡Perfil profesional guardado con éxito!");
+        document.getElementById('user-name-display').innerText = medicoActualDatos.nombre;
+      } catch (error) {
+        alert("Error al guardar perfil: " + error.message);
+      }
+    });
+
+    // Generar Vista Previa del PDF
+    document.getElementById('btn-generar-pdf').addEventListener('click', async () => {
+      const nombre = document.getElementById('paciente-nombre').value || 'N/A';
+      const cedula = document.getElementById('paciente-cedula').value || 'N/A';
+      const edad = document.getElementById('paciente-edad').value || 'N/A';
+      const fecha = new Date().toLocaleDateString('es-ES');
+      const select = document.getElementById('select-estudio');
+      const estudio = select.options[select.selectedIndex].text;
+      
+      const hallazgos = document.getElementById('hallazgos-texto').innerHTML;
+      const conclusion = document.getElementById('conclusion-texto').innerHTML;
+
+      document.getElementById('pdf-nombre').innerText = nombre;
+      document.getElementById('pdf-cedula').innerText = cedula;
+      document.getElementById('pdf-edad').innerText = edad;
+      document.getElementById('pdf-fecha').innerText = fecha;
+      document.getElementById('pdf-estudio').innerText = estudio;
+      
+      document.getElementById('pdf-hallazgos').innerHTML = hallazgos;
+      document.getElementById('pdf-conclusion').innerHTML = conclusion;
+
+      document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr. (No configurado)';
+      document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
+      
+      if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
+        document.getElementById('pdf-medico-cmv').innerText = `CMV: ${medicoActualDatos.cmv}`;
+      } else {
+        document.getElementById('pdf-medico-cmv').innerText = '';
+      }
+
+      const imgSello = document.getElementById('pdf-img-sello');
+      if (medicoActualDatos.selloUrl) {
+        imgSello.src = medicoActualDatos.selloUrl;
+        imgSello.classList.remove('hidden');
+      } else {
+        imgSello.classList.add('hidden');
+      }
+
+      const imgFirma = document.getElementById('pdf-img-firma');
+      if (medicoActualDatos.firmaUrl) {
+        imgFirma.src = medicoActualDatos.firmaUrl;
+        imgFirma.classList.remove('hidden');
+      } else {
+        imgFirma.classList.add('hidden');
+      }
+
+      // Guardar en historial
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          await addDoc(collection(db, "examenes"), {
+            pacienteNombre: nombre,
+            pacienteCedula: cedula,
+            pacienteEdad: edad,
+            estudioTipo: estudio,
+            hallazgos: hallazgos,
+            conclusion: conclusion,
+            fechaStr: fecha,
+            medicoUid: user.uid,
+            medicoNombre: medicoActualDatos.nombre || user.email,
+            fechaServidor: serverTimestamp()
+          });
+        } catch (e) {
+          console.error("Error al guardar en historial: ", e);
+        }
+      }
+
+      // Mostrar modal
+      document.getElementById('modal-preview').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
