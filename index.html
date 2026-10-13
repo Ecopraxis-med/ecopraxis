@@ -79,9 +79,9 @@
       </div>
     </div>
 
-    <!-- Columna Derecha: Formularios (Login / Registro / Recuperación) -->
-    <div class="md:w-7/12 bg-white p-8 md:p-16 flex flex-col justify-center overflow-y-auto max-h-screen">
-      <div class="max-w-md w-full mx-auto my-auto">
+    <!-- Columna Derecha: Formularios (Alineado superior corregido) -->
+    <div class="md:w-7/12 bg-white p-6 md:p-12 flex flex-col justify-start items-center overflow-y-auto max-h-screen py-8">
+      <div class="max-w-md w-full">
         
         <!-- 1. FORMULARIO DE INICIO DE SESIÓN -->
         <div id="form-login-container">
@@ -131,9 +131,9 @@
           </div>
         </div>
 
-        <!-- 2. FORMULARIO DE REGISTRO PROFESIONAL -->
+        <!-- 2. FORMULARIO DE REGISTRO PROFESIONAL (ESTRUCTURA CORREGIDA) -->
         <div id="form-register-container" class="hidden">
-          <div class="mb-6">
+          <div class="mb-5">
             <h3 class="text-2xl font-bold text-slate-900 tracking-tight">Registro Profesional</h3>
             <p class="text-xs text-slate-500 mt-1">Completa tus datos para configurar tu perfil médico automatizado.</p>
           </div>
@@ -142,22 +142,22 @@
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre</label>
-                <input type="text" id="reg-nombre" placeholder="Fabián Andrés" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <input type="text" id="reg-nombre" placeholder="Fabián Andrés" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Apellido</label>
-                <input type="text" id="reg-apellido" placeholder="Semprun" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <input type="text" id="reg-apellido" placeholder="Semprun" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Cédula de Identidad</label>
-                <input type="text" id="reg-cedula" placeholder="V-12345678" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <input type="text" id="reg-cedula" placeholder="V-12345678" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Género (Título automático)</label>
-                <select id="reg-genero" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <select id="reg-genero" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
                   <option value="Dr.">Masculino (Dr.)</option>
                   <option value="Dra.">Femenino (Dra.)</option>
                 </select>
@@ -166,27 +166,27 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Correo electrónico</label>
-              <input type="email" id="reg-email" placeholder="medico@ecopraxis.com" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+              <input type="email" id="reg-email" placeholder="medico@ecopraxis.com" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Contraseña</label>
-                <input type="password" id="reg-pass" placeholder="••••••••" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <input type="password" id="reg-pass" placeholder="••••••••" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Repita la contraseña</label>
-                <input type="password" id="reg-pass-confirm" placeholder="••••••••" class="w-full p-3 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
+                <input type="password" id="reg-pass-confirm" placeholder="••••••••" class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50/50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
               </div>
             </div>
 
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Foto de Perfil Profesional (Opcional)</label>
-              <input type="file" id="reg-foto-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-ecopraxLight file:text-ecopraxBlue hover:file:bg-blue-100 cursor-pointer">
+              <input type="file" id="reg-foto-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-ecopraxLight file:text-ecopraxBlue hover:file:bg-blue-100 cursor-pointer">
             </div>
 
             <div class="pt-2 flex flex-col gap-2">
-              <button id="btn-register-submit" class="w-full bg-[#042050] hover:bg-slate-900 text-white font-semibold py-3 rounded-xl text-xs transition shadow-md cursor-pointer">Completar Registro</button>
+              <button id="btn-register-submit" class="w-full bg-[#042050] hover:bg-slate-900 text-white font-bold py-3 rounded-xl text-xs transition shadow-md cursor-pointer">Completar Registro</button>
               <button type="button" id="link-to-login-1" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition cursor-pointer">Volver al inicio de sesión</button>
             </div>
           </div>
@@ -584,7 +584,7 @@
         });
       }
 
-      // Enlaces de navegación entre formularios
+      // Enlaces de navegación
       const linkToReg = document.getElementById('link-to-register');
       if (linkToReg) {
         linkToReg.addEventListener('click', () => {
