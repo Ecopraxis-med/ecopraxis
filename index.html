@@ -21,7 +21,7 @@
   <style>
     .editor-clinico {
       font-family: Arial, Helvetica, sans-serif;
-      min-height: 180px;
+      min-height: 140px;
       max-height: 300px;
       overflow-y: auto;
     }
@@ -181,7 +181,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
       
-      <!-- VISTA 1: REGISTROS REALIZADOS (Con opción de borrado) -->
+      <!-- VISTA 1: REGISTROS REALIZADOS -->
       <div id="vista-registros" class="seccion-vista max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-4 md:p-6 border-t-4 border-ecopraxBlue">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b">
           <div>
@@ -274,7 +274,7 @@
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Tipo de Estudio Ecográfico</label>
-                <select id="pac-estudio" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 font-bold text-ecopraxDark">
+                <select id="pac-estudio" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 font-bold text-ecopraxDark" onchange="actualizarPlantillasAlCambiarEstudio()">
                   <option value="Ecografía Abdominal">Ecografía Abdominal</option>
                   <option value="Ecografía Renal y Vías Urinarias">Ecografía Renal y Vías Urinarias</option>
                   <option value="Ecografía Hepatobiliar">Ecografía Hepatobiliar</option>
@@ -317,20 +317,35 @@
             <button onclick="volverAPasoPaciente()" class="text-xs font-semibold text-slate-500 hover:underline">← Modificar Paciente</button>
           </div>
 
-          <!-- SECCIÓN DE TRANSDUCTOR Y VÍA (CUADRO DE TEXTO MODIFICABLE SIN TÍTULO ESTRICTO) -->
-          <div class="mb-4 bg-slate-50 border p-3 rounded-xl">
-            <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase">Especificaciones del Estudio (Transductor y Vía)</label>
-            <input type="text" id="info-transductor" placeholder="Ej: Transductor Convexo de 3.5 MHz. Abordaje suprapúbico." class="w-full p-2 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-ecopraxBlue">
+          <!-- SECCIÓN TRANSDUCTOR Y VÍA (CON FORMATO EDITABLE) -->
+          <div class="mb-6 bg-slate-50 border p-3 rounded-xl">
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-[11px] font-bold text-slate-600 uppercase">Especificaciones del Estudio (Transductor y Vía)</label>
+              <div class="flex items-center gap-1 bg-white p-1 rounded-lg border">
+                <button type="button" onclick="ejecutarComandoCustom('info-transductor', 'bold')" class="w-7 h-7 font-bold bg-slate-50 border rounded text-xs"><b>N</b></button>
+                <button type="button" onclick="ejecutarComandoCustom('info-transductor', 'italic')" class="w-7 h-7 italic bg-slate-50 border rounded text-xs"><i>K</i></button>
+                <button type="button" onclick="ejecutarComandoCustom('info-transductor', 'insertUnorderedList')" class="w-7 h-7 bg-slate-50 border rounded text-xs font-bold">☰•</button>
+                <button type="button" onclick="ejecutarComandoCustom('info-transductor', 'insertOrderedList')" class="w-7 h-7 bg-slate-50 border rounded text-xs font-bold">1.</button>
+                <select onchange="cambiarCasoCustom('info-transductor', this)" class="h-7 px-1 text-xs font-bold bg-slate-50 border rounded text-ecopraxBlue">
+                  <option value="" disabled selected>AA ▾</option>
+                  <option value="mayus">MAYÚSCULAS</option>
+                  <option value="minus">minúsculas</option>
+                </select>
+              </div>
+            </div>
+            <div id="info-transductor" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-white outline-none" style="min-height: 70px; max-height: 120px;"></div>
           </div>
 
+          <!-- SECCIÓN HALLAZGOS -->
           <section class="mb-6">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-xs font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase">Hallazgos</h3>
               <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-                <button type="button" onclick="ejecutarComando('bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
-                <button type="button" onclick="ejecutarComando('italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
-                <button type="button" onclick="ejecutarComando('insertUnorderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">☰•</button>
-                <select onchange="cambiarCaso('hallazgos-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
+                <button type="button" onclick="ejecutarComandoCustom('hallazgos-texto', 'bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
+                <button type="button" onclick="ejecutarComandoCustom('hallazgos-texto', 'italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
+                <button type="button" onclick="ejecutarComandoCustom('hallazgos-texto', 'insertUnorderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">☰•</button>
+                <button type="button" onclick="ejecutarComandoCustom('hallazgos-texto', 'insertOrderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">1.</button>
+                <select onchange="cambiarCasoCustom('hallazgos-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
                   <option value="" disabled selected>AA ▾</option>
                   <option value="mayus">MAYÚSCULAS</option>
                   <option value="minus">minúsculas</option>
@@ -350,13 +365,16 @@
             </div>
           </section>
 
+          <!-- SECCIÓN CONCLUSIÓN -->
           <section class="mb-6">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-xs font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase">Conclusión Diagnóstica</h3>
               <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-                <button type="button" onclick="ejecutarComandoConclusion('bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
-                <button type="button" onclick="ejecutarComandoConclusion('italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
-                <select onchange="cambiarCaso('conclusion-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
+                <button type="button" onclick="ejecutarComandoCustom('conclusion-texto', 'bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
+                <button type="button" onclick="ejecutarComandoCustom('conclusion-texto', 'italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
+                <button type="button" onclick="ejecutarComandoCustom('conclusion-texto', 'insertUnorderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">☰•</button>
+                <button type="button" onclick="ejecutarComandoCustom('conclusion-texto', 'insertOrderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">1.</button>
+                <select onchange="cambiarCasoCustom('conclusion-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
                   <option value="" disabled selected>AA ▾</option>
                   <option value="mayus">MAYÚSCULAS</option>
                   <option value="minus">minúsculas</option>
@@ -385,15 +403,15 @@
 
       </div>
 
-      <!-- VISTA 3: CONFIGURACIÓN DEL REPORTE (Plantillas por estudio, cabecera e institucional, color de línea) -->
+      <!-- VISTA 3: CONFIGURACIÓN DEL REPORTE -->
       <div id="vista-config-reporte" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
         <h2 class="text-xl font-black text-ecopraxDark mb-2">Configuración del Reporte</h2>
-        <p class="text-xs text-slate-500 mb-6">Personaliza las plantillas por estudio, logos institucionales y diseño de tus reportes.</p>
+        <p class="text-xs text-slate-500 mb-6">Personaliza las plantillas por estudio, cabeceras y diseño general de tus reportes.</p>
         
         <div class="space-y-6">
-          <!-- 1. PERSONALIZAR PLANTILLAS POR ESTUDIO -->
-          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Plantillas de Hallazgos por Tipo de Estudio</h3>
+          <!-- 1. PERSONALIZAR PLANTILLAS POR ESTUDIO (CON EDITORES RICOS) -->
+          <div class="border p-4 rounded-xl bg-slate-50 space-y-4">
+            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Plantillas Predeterminadas por Tipo de Estudio</h3>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Seleccione el estudio a configurar</label>
               <select id="config-select-estudio" onchange="cargarPlantillaEnEditorConfig()" class="w-full p-2.5 border rounded-xl text-xs bg-white font-bold text-ecopraxBlue">
@@ -409,18 +427,68 @@
                 <option value="Ecografía Transvaginal">Ecografía Transvaginal</option>
               </select>
             </div>
+
+            <!-- CONFIGURADOR TRANSDUCTOR / VÍA -->
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Plantilla Predeterminada de Hallazgos</label>
-              <textarea id="config-plantilla-hallazgos" class="w-full p-3 border rounded-xl text-xs bg-white h-28 outline-none font-arial" placeholder="Escriba la plantilla predeterminada..."></textarea>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-semibold text-slate-700 uppercase">Plantilla de Transductor y Vía</label>
+                <div class="flex items-center gap-1 bg-white p-1 rounded-lg border">
+                  <button type="button" onclick="ejecutarComandoCustom('config-transductor', 'bold')" class="w-6 h-6 font-bold bg-slate-50 border rounded text-xs"><b>N</b></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-transductor', 'italic')" class="w-6 h-6 italic bg-slate-50 border rounded text-xs"><i>K</i></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-transductor', 'insertUnorderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">☰•</button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-transductor', 'insertOrderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">1.</button>
+                  <select onchange="cambiarCasoCustom('config-transductor', this)" class="h-6 px-1 text-[10px] font-bold bg-slate-50 border rounded text-ecopraxBlue">
+                    <option value="" disabled selected>AA ▾</option>
+                    <option value="mayus">MAYÚS</option>
+                    <option value="minus">minús</option>
+                  </select>
+                </div>
+              </div>
+              <div id="config-transductor" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-white outline-none" style="min-height: 60px; max-height: 100px;"></div>
             </div>
+
+            <!-- CONFIGURADOR HALLAZGOS -->
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Conclusión Predeterminada</label>
-              <input type="text" id="config-plantilla-conclusion" class="w-full p-2.5 border rounded-xl text-xs bg-white outline-none" placeholder="Conclusión por defecto...">
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-semibold text-slate-700 uppercase">Plantilla de Hallazgos</label>
+                <div class="flex items-center gap-1 bg-white p-1 rounded-lg border">
+                  <button type="button" onclick="ejecutarComandoCustom('config-hallazgos', 'bold')" class="w-6 h-6 font-bold bg-slate-50 border rounded text-xs"><b>N</b></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-hallazgos', 'italic')" class="w-6 h-6 italic bg-slate-50 border rounded text-xs"><i>K</i></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-hallazgos', 'insertUnorderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">☰•</button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-hallazgos', 'insertOrderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">1.</button>
+                  <select onchange="cambiarCasoCustom('config-hallazgos', this)" class="h-6 px-1 text-[10px] font-bold bg-slate-50 border rounded text-ecopraxBlue">
+                    <option value="" disabled selected>AA ▾</option>
+                    <option value="mayus">MAYÚS</option>
+                    <option value="minus">minús</option>
+                  </select>
+                </div>
+              </div>
+              <div id="config-hallazgos" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-white outline-none"></div>
             </div>
-            <button onclick="guardarPlantillaEstudioPersonalizada()" class="bg-ecopraxBlue text-white text-xs font-bold px-4 py-2 rounded-xl">Guardar Plantilla de este Estudio</button>
+
+            <!-- CONFIGURADOR CONCLUSIÓN -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-semibold text-slate-700 uppercase">Plantilla de Conclusión</label>
+                <div class="flex items-center gap-1 bg-white p-1 rounded-lg border">
+                  <button type="button" onclick="ejecutarComandoCustom('config-conclusion', 'bold')" class="w-6 h-6 font-bold bg-slate-50 border rounded text-xs"><b>N</b></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-conclusion', 'italic')" class="w-6 h-6 italic bg-slate-50 border rounded text-xs"><i>K</i></button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-conclusion', 'insertUnorderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">☰•</button>
+                  <button type="button" onclick="ejecutarComandoCustom('config-conclusion', 'insertOrderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">1.</button>
+                  <select onchange="cambiarCasoCustom('config-conclusion', this)" class="h-6 px-1 text-[10px] font-bold bg-slate-50 border rounded text-ecopraxBlue">
+                    <option value="" disabled selected>AA ▾</option>
+                    <option value="mayus">MAYÚS</option>
+                    <option value="minus">minús</option>
+                  </select>
+                </div>
+              </div>
+              <div id="config-conclusion" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-white outline-none" style="min-height: 80px; max-height: 150px;"></div>
+            </div>
+
+            <button onclick="guardarPlantillaEstudioPersonalizada()" class="bg-ecopraxBlue text-white text-xs font-bold px-4 py-2.5 rounded-xl">Guardar Plantilla de este Estudio</button>
           </div>
 
-          <!-- 2. CABECERA INSTITUCIONAL E IMAGEN -->
+          <!-- 2. CABECERA INSTITUCIONAL -->
           <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
             <h3 class="text-xs font-bold uppercase text-ecopraxDark">Cabecera Institucional y Logos Personalizados</h3>
             <p class="text-[11px] text-slate-500">Sube el logo de la clínica u hospital (opcional) que aparecerá en la cabecera junto a Ecopraxis.</p>
@@ -532,7 +600,7 @@
       </div>
 
       <div id="planilla-imprimible">
-        <!-- CABECERA CON LÍNEA DIVISORIA DINÁMICA Y LOGO INSTITUCIONAL OPCIONAL -->
+        <!-- CABECERA -->
         <div id="pdf-header-container" class="flex justify-between items-center pb-4 mb-6 border-b-2" style="border-color: #042050;">
           <div class="flex items-center gap-3">
             <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
@@ -558,9 +626,9 @@
           <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
         </div>
 
-        <!-- SECCIÓN TRANSDUCTOR Y VÍA (SIN TÍTULO ESTRICTO) -->
-        <div id="pdf-container-transductor" class="mb-4 text-xs italic text-slate-600 bg-slate-100 p-2 rounded">
-          <span id="pdf-transductor"></span>
+        <!-- TRANSDUCTOR Y VÍA -->
+        <div id="pdf-container-transductor" class="mb-4 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border font-arial">
+          <div id="pdf-transductor"></div>
         </div>
 
         <div class="mb-4">
@@ -630,13 +698,14 @@
     let examenesListaGlobal = [];
     let examenEditandoId = null;
 
-    // Plantillas por defecto robustas
     let plantillasPorDefecto = {
       "Ecografía Abdominal": {
+        transductor: "Transductor Convexo de 3.5 MHz. Abordaje convencional.",
         hallazgos: "<ul><li><b>HÍGADO:</b> Forma, tamaño y ecoestructura normales. Sin lesiones focales.</li><li><b>VESÍCULA BILIAR:</b> Paredes finas, luz anecoica libre de litiasis.</li><li><b>PÁNCREAS Y BAZO:</b> Sin alteraciones ecográficas visibles.</li><li><b>RIÑONES:</b> Morfología conservada, sin ectasia ni litiasis.</li></ul>",
         conclusion: "Ecografía Abdominal dentro de parámetros normales."
       },
       "Ecografía Renal y Vías Urinarias": {
+        transductor: "Transductor Convexo de 3.5 MHz. Abordaje suprapúbico y fosas lumbares.",
         hallazgos: "<ul><li><b>RIÑÓN DERECHO:</b> Tamaño y parénquima normales. Sin litiasis.</li><li><b>RIÑÓN IZQUIERDO:</b> Sin alteraciones morfológicas. Sin litiasis.</li><li><b>VEJIGA:</b> Repleción adecuada, paredes finas.</li></ul>",
         conclusion: "Estudio renal y de vías urinarias sin alteraciones visibles."
       }
@@ -689,9 +758,9 @@
       document.getElementById('container-fecha-manual').classList.add('hidden');
       document.getElementById('pac-fecha-manual').value = "";
 
-      document.getElementById('info-transductor').value = "Transductor Convexo de 3.5 MHz. Abordaje convencional.";
-      document.getElementById('hallazgos-texto').innerHTML = "";
-      document.getElementById('conclusion-texto').innerHTML = "";
+      // Cargar plantilla inicial del primer estudio
+      aplicarPlantillaEstudioEnReporte("Ecografía Abdominal");
+
       document.getElementById('check-observaciones').checked = false;
       document.getElementById('sec-observaciones').classList.add('hidden');
       document.getElementById('texto-observaciones').value = "";
@@ -705,6 +774,21 @@
       cambiarVista('vista-nuevo-reporte');
     }
 
+    window.actualizarPlantillasAlCambiarEstudio = function() {
+      if (examenEditandoId !== null) return; // Si estamos editando un informe existente, no sobrescribir
+      const estudio = document.getElementById('pac-estudio').value;
+      aplicarPlantillaEstudioEnReporte(estudio);
+    }
+
+    function aplicarPlantillaEstudioEnReporte(estudio) {
+      const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
+      const plantilla = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { transductor: "", hallazgos: "", conclusion: "" };
+
+      document.getElementById('info-transductor').innerHTML = plantilla.transductor || '';
+      document.getElementById('hallazgos-texto').innerHTML = plantilla.hallazgos || '';
+      document.getElementById('conclusion-texto').innerHTML = plantilla.conclusion || '';
+    }
+
     window.toggleFechaManual = function(check) {
       document.getElementById('container-fecha-manual').classList.toggle('hidden', !check.checked);
     }
@@ -713,7 +797,6 @@
       document.getElementById(idContainer).classList.toggle('hidden', !check.checked);
     }
 
-    // GUARDAR PACIENTE Y CARGAR PLANTILLA DINÁMICA DEL ESTUDIO SELECCIONADO
     window.guardarPacienteYContinuar = function() {
       const nom = document.getElementById('pac-nombre').value.trim();
       const ape = document.getElementById('pac-apellido').value.trim();
@@ -727,18 +810,6 @@
       const estudio = document.getElementById('pac-estudio').value;
       document.getElementById('resumen-paciente-paso2').innerText = `Paciente: ${nom} ${ape} | C.I: ${ced} | ${estudio}`;
 
-      const hallazgosElem = document.getElementById('hallazgos-texto');
-      const conclusionElem = document.getElementById('conclusion-texto');
-
-      // Buscar si el médico tiene plantilla guardada para este estudio, sino usar por defecto
-      const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
-      const plantillaActual = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { hallazgos: "Escriba aquí los hallazgos...", conclusion: "Conclusión diagnóstica." };
-
-      if (!hallazgosElem.innerHTML.trim() || examenEditandoId === null) {
-        hallazgosElem.innerHTML = plantillaActual.hallazgos;
-        conclusionElem.innerHTML = plantillaActual.conclusion;
-      }
-
       document.getElementById('paso-paciente').classList.add('hidden');
       document.getElementById('paso-clinico').classList.remove('hidden');
     }
@@ -748,25 +819,27 @@
       document.getElementById('paso-paciente').classList.remove('hidden');
     }
 
-    // GESTIÓN DE PLANTILLAS EN CONFIGURACIÓN DE REPORTE
+    // GESTIÓN DE PLANTILLAS EN CONFIGURACIÓN
     window.cargarPlantillaEnEditorConfig = function() {
       const estudio = document.getElementById('config-select-estudio').value;
       const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
-      const plantilla = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { hallazgos: "", conclusion: "" };
+      const plantilla = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { transductor: "", hallazgos: "", conclusion: "" };
 
-      document.getElementById('config-plantilla-hallazgos').value = plantilla.hallazgos;
-      document.getElementById('config-plantilla-conclusion').value = plantilla.conclusion;
+      document.getElementById('config-transductor').innerHTML = plantilla.transductor || '';
+      document.getElementById('config-hallazgos').innerHTML = plantilla.hallazgos || '';
+      document.getElementById('config-conclusion').innerHTML = plantilla.conclusion || '';
     }
 
     window.guardarPlantillaEstudioPersonalizada = async function() {
       const estudio = document.getElementById('config-select-estudio').value;
-      const hall = document.getElementById('config-plantilla-hallazgos').value;
-      const conc = document.getElementById('config-plantilla-conclusion').value;
+      const trans = document.getElementById('config-transductor').innerHTML;
+      const hall = document.getElementById('config-hallazgos').innerHTML;
+      const conc = document.getElementById('config-conclusion').innerHTML;
 
       if (!medicoActualDatos.plantillasEstudios) {
         medicoActualDatos.plantillasEstudios = {};
       }
-      medicoActualDatos.plantillasEstudios[estudio] = { hallazgos: hall, conclusion: conc };
+      medicoActualDatos.plantillasEstudios[estudio] = { transductor: trans, hallazgos: hall, conclusion: conc };
 
       const user = auth.currentUser;
       if (user) {
@@ -799,7 +872,6 @@
       }
     }
 
-    // CONVERTIR IMAGEN A BASE64 PARA FIRESTORE
     function convertirFileBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -809,7 +881,7 @@
       });
     }
 
-    // PACIENTES YA REGISTRADOS Y BORRADO DE REGISTROS
+    // PACIENTES Y REGISTROS
     window.abrirModalPacientesRegistrados = function() {
       document.getElementById('modal-pacientes').classList.remove('hidden');
       renderizarListaPacientesModal(examenesListaGlobal);
@@ -985,7 +1057,7 @@
       selectEstudio.value = item.estudioTipo;
       selectEstudio.disabled = true;
 
-      document.getElementById('info-transductor').value = item.transductor || '';
+      document.getElementById('info-transductor').innerHTML = item.transductor || '';
       document.getElementById('hallazgos-texto').innerHTML = item.hallazgos || '';
       document.getElementById('conclusion-texto').innerHTML = item.conclusion || '';
 
@@ -1001,7 +1073,8 @@
       }
 
       cambiarVista('vista-nuevo-reporte');
-      guardarPacienteYContinuar();
+      document.getElementById('paso-paciente').classList.add('hidden');
+      document.getElementById('paso-clinico').classList.remove('hidden');
     }
 
     window.accionBorrar = async function() {
@@ -1027,7 +1100,7 @@
       const tel = document.getElementById('pac-telefono').value.trim();
       const sexo = document.getElementById('pac-sexo').value;
       const estudio = document.getElementById('pac-estudio').value;
-      const transductor = document.getElementById('info-transductor').value;
+      const transductor = document.getElementById('info-transductor').innerHTML;
       
       let fechaStr;
       const checkManual = document.getElementById('check-fecha-manual').checked;
@@ -1071,7 +1144,7 @@
       document.getElementById('pdf-telefono').innerText = item.pacienteTelefono || 'N/A';
       document.getElementById('pdf-fecha').innerText = item.fechaStr;
       document.getElementById('pdf-estudio').innerText = item.estudioTipo;
-      document.getElementById('pdf-transductor').innerText = item.transductor || '';
+      document.getElementById('pdf-transductor').innerHTML = item.transductor || '';
       document.getElementById('pdf-hallazgos').innerHTML = item.hallazgos;
       document.getElementById('pdf-conclusion').innerHTML = item.conclusion;
 
@@ -1095,11 +1168,9 @@
         document.getElementById('pdf-medico-cmv').innerText = `CMV: ${medicoActualDatos.cmv}`;
       }
 
-      // Aplicar color de línea personalizado
       const colorLinea = medicoActualDatos.colorLinea || '#042050';
       document.getElementById('pdf-header-container').style.borderColor = colorLinea;
 
-      // Logo institucional
       const imgInst = document.getElementById('pdf-img-institucion');
       if (medicoActualDatos.logoInstUrl) {
         imgInst.src = medicoActualDatos.logoInstUrl;
@@ -1122,7 +1193,7 @@
       const tel = document.getElementById('pac-telefono').value.trim();
       const sexo = document.getElementById('pac-sexo').value;
       const estudio = document.getElementById('pac-estudio').value;
-      const transductor = document.getElementById('info-transductor').value;
+      const transductor = document.getElementById('info-transductor').innerHTML;
 
       let fechaStr, fechaISO;
       const checkManual = document.getElementById('check-fecha-manual').checked;
@@ -1243,17 +1314,16 @@
       }
     }
 
-    window.ejecutarComando = function(command) {
-      document.getElementById('hallazgos-texto').focus();
+    // COMANDOS EDITORES GENERALES
+    window.ejecutarComandoCustom = function(idEditor, command) {
+      const editor = document.getElementById(idEditor);
+      editor.focus();
       document.execCommand(command, false, null);
     }
-    window.ejecutarComandoConclusion = function(command) {
-      document.getElementById('conclusion-texto').focus();
-      document.execCommand(command, false, null);
-    }
-    window.cambiarCaso = function(idElemento, selectElem) {
+
+    window.cambiarCasoCustom = function(idEditor, selectElem) {
       const opcion = selectElem.value;
-      const editor = document.getElementById(idElemento);
+      const editor = document.getElementById(idEditor);
       editor.focus();
       const seleccion = window.getSelection();
       if (seleccion.rangeCount > 0 && !seleccion.isCollapsed) {
