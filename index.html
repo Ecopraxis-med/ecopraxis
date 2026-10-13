@@ -18,6 +18,12 @@
       }
     }
   </script>
+  <style>
+    /* Forzar fuente Arial limpia en las zonas clínicas */
+    .font-arial {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
 
@@ -26,11 +32,9 @@
     
     <!-- Columna Izquierda: Branding & Info -->
     <div class="md:w-5/12 bg-[#042050] text-white p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
-      <!-- Decoración de fondo sutil -->
       <div class="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none"></div>
 
       <div>
-        <!-- Logo en versión negativa (sin bordes) -->
         <div class="flex items-center gap-3 mb-12">
           <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" alt="Logo ECOPRAXIS" class="w-12 h-12 object-contain">
           <div>
@@ -190,19 +194,37 @@
       </select>
     </section>
 
-    <!-- HALLAZGOS -->
+    <!-- HALLAZGOS CON BARRA DE HERRAMIENTAS -->
     <section class="mb-6">
-      <div class="flex justify-between items-center mb-2">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Hallazgos</h2>
+        
+        <!-- Barra de herramientas de formato -->
+        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
+          <button type="button" onclick="formatoTexto('hallazgos-texto', '<b>', '</b>')" class="px-2 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="formatoTexto('hallazgos-texto', '<i>', '</i>')" class="px-2 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Cursiva"><i>C</i></button>
+          <button type="button" onclick="formatoTexto('hallazgos-texto', '- ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Viñeta">• Viñeta</button>
+          <button type="button" onclick="formatoTexto('hallazgos-texto', '1. ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Lista numerada">1. Lista</button>
+        </div>
+
         <button id="btn-restablecer" class="text-xs font-semibold text-ecopraxBlue hover:underline cursor-pointer">Restablecer Plantilla</button>
       </div>
-      <textarea id="hallazgos-texto" rows="8" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+      <textarea id="hallazgos-texto" rows="8" class="w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
     </section>
 
-    <!-- CONCLUSIÓN -->
+    <!-- CONCLUSIÓN CON BARRA DE HERRAMIENTAS -->
     <section class="mb-6">
-      <h2 class="text-sm font-bold text-ecopraxDark mb-2 border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Conclusión Diagnóstica</h2>
-      <textarea id="conclusion-texto" rows="3" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Conclusión Diagnóstica</h2>
+        
+        <!-- Barra de herramientas de formato -->
+        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
+          <button type="button" onclick="formatoTexto('conclusion-texto', '<b>', '</b>')" class="px-2 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="formatoTexto('conclusion-texto', '<i>', '</i>')" class="px-2 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Cursiva"><i>C</i></button>
+          <button type="button" onclick="formatoTexto('conclusion-texto', '- ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Viñeta">• Viñeta</button>
+        </div>
+      </div>
+      <textarea id="conclusion-texto" rows="3" class="w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
     </section>
 
     <!-- BOTÓN DE GENERAR -->
@@ -243,7 +265,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6">
+        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6 font-arial">
           <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
           <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
           <p><strong>Edad:</strong> <span id="pdf-edad"></span></p>
@@ -253,12 +275,13 @@
 
         <div class="mb-6">
           <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
-          <p id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-mono"></p>
+          <!-- innerHTML permite renderizar etiquetas <b>, <i>, etc. -->
+          <div id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-arial"></div>
         </div>
 
         <div class="mb-12">
           <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
-          <p id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-mono"></p>
+          <div id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-arial"></div>
         </div>
 
         <div class="flex justify-between items-end mt-16 pt-4">
@@ -313,6 +336,21 @@
       }
     };
 
+    // Función para insertar formato (negrita, cursiva, viñetas, listas)
+    window.formatoTexto = function(idElemento, tagInicio, tagFin) {
+      const textarea = document.getElementById(idElemento);
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const textoSeleccionado = textarea.value.substring(start, end);
+      
+      const reemplazo = tagInicio + textoSeleccionado + tagFin;
+      textarea.value = textarea.value.substring(0, start) + reemplazo + textarea.value.substring(end);
+      
+      // Reposicionar el cursor
+      textarea.focus();
+      textarea.setSelectionRange(start + tagInicio.length, end + tagInicio.length);
+    }
+
     function cargarPlantilla() {
       const tipo = document.getElementById('select-estudio').value;
       if (plantillas[tipo]) {
@@ -327,7 +365,6 @@
       cargarPlantilla();
     });
 
-    // Checkbox de Colegiado
     document.getElementById('check-colegiado').addEventListener('change', function() {
       const container = document.getElementById('container-cmv');
       if (this.checked) {
@@ -338,17 +375,14 @@
       }
     });
 
-    // Cerrar modal
     document.getElementById('btn-cerrar-modal').addEventListener('click', () => {
       document.getElementById('modal-preview').classList.add('hidden');
     });
 
-    // Imprimir / PDF
     document.getElementById('btn-imprimir').addEventListener('click', () => {
       window.print();
     });
 
-    // Cargar plantilla inicial al abrir
     window.addEventListener('DOMContentLoaded', () => {
       cargarPlantilla();
     });
@@ -521,8 +555,10 @@
       document.getElementById('pdf-edad').innerText = edad;
       document.getElementById('pdf-fecha').innerText = fecha;
       document.getElementById('pdf-estudio').innerText = estudio;
-      document.getElementById('pdf-hallazgos').innerText = hallazgos;
-      document.getElementById('pdf-conclusion').innerText = conclusion;
+      
+      // Usar innerHTML para que se interpreten las etiquetas de negrita/cursiva en el PDF
+      document.getElementById('pdf-hallazgos').innerHTML = hallazgos.replace(/\n/g, '<br>');
+      document.getElementById('pdf-conclusion').innerHTML = conclusion.replace(/\n/g, '<br>');
 
       document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr. (No configurado)';
       document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
