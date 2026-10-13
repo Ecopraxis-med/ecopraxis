@@ -19,7 +19,21 @@
     }
   </script>
   <style>
-    /* Forzar fuente Arial limpia en las zonas clínicas */
+    /* Estilos profesionales para el editor clínico */
+    .editor-clinico {
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 180px;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    .editor-clinico ul {
+      list-style-type: disc !important;
+      margin-left: 1.5rem !important;
+    }
+    .editor-clinico ol {
+      list-style-type: decimal !important;
+      margin-left: 1.5rem !important;
+    }
     .font-arial {
       font-family: Arial, Helvetica, sans-serif;
     }
@@ -30,7 +44,6 @@
   <!-- LOGIN / REGISTRO (DISEÑO SPLIT-SCREEN) -->
   <div id="auth-section" class="min-h-screen flex flex-col md:flex-row">
     
-    <!-- Columna Izquierda: Branding & Info -->
     <div class="md:w-5/12 bg-[#042050] text-white p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
       <div class="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none"></div>
 
@@ -66,7 +79,6 @@
       </div>
     </div>
 
-    <!-- Columna Derecha: Formulario -->
     <div class="md:w-7/12 bg-white p-8 md:p-20 flex flex-col justify-center">
       <div class="max-w-md w-full mx-auto">
         <div class="mb-8">
@@ -194,37 +206,37 @@
       </select>
     </section>
 
-    <!-- HALLAZGOS CON BARRA DE HERRAMIENTAS -->
+    <!-- HALLAZGOS CON EDITOR ENRIQUECIDO -->
     <section class="mb-6">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 gap-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Hallazgos</h2>
         
-        <!-- Barra de herramientas de formato -->
+        <!-- Barra de herramientas visual -->
         <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-          <button type="button" onclick="formatoTexto('hallazgos-texto', '<b>', '</b>')" class="px-2 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Negrita"><b>N</b></button>
-          <button type="button" onclick="formatoTexto('hallazgos-texto', '<i>', '</i>')" class="px-2 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Cursiva"><i>C</i></button>
-          <button type="button" onclick="formatoTexto('hallazgos-texto', '- ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Viñeta">• Viñeta</button>
-          <button type="button" onclick="formatoTexto('hallazgos-texto', '1. ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Lista numerada">1. Lista</button>
+          <button type="button" onclick="ejecutarComando('bold')" class="px-2.5 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="ejecutarComando('italic')" class="px-2.5 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>C</i></button>
+          <button type="button" onclick="ejecutarComando('insertUnorderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Viñeta con punto">• Viñeta</button>
+          <button type="button" onclick="ejecutarComando('insertOrderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Lista numerada">1. Lista</button>
         </div>
 
         <button id="btn-restablecer" class="text-xs font-semibold text-ecopraxBlue hover:underline cursor-pointer">Restablecer Plantilla</button>
       </div>
-      <textarea id="hallazgos-texto" rows="8" class="w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+      <!-- Div editable (contenteditable) para permitir formato visual directo y enter automático en listas -->
+      <div id="hallazgos-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></div>
     </section>
 
-    <!-- CONCLUSIÓN CON BARRA DE HERRAMIENTAS -->
+    <!-- CONCLUSIÓN CON EDITOR ENRIQUECIDO -->
     <section class="mb-6">
       <div class="flex justify-between items-center mb-2">
         <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Conclusión Diagnóstica</h2>
         
-        <!-- Barra de herramientas de formato -->
         <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-          <button type="button" onclick="formatoTexto('conclusion-texto', '<b>', '</b>')" class="px-2 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Negrita"><b>N</b></button>
-          <button type="button" onclick="formatoTexto('conclusion-texto', '<i>', '</i>')" class="px-2 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Cursiva"><i>C</i></button>
-          <button type="button" onclick="formatoTexto('conclusion-texto', '- ', '')" class="px-2 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer" title="Viñeta">• Viñeta</button>
+          <button type="button" onclick="ejecutarComandoConclusion('bold')" class="px-2.5 py-1 text-xs font-bold bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Negrita"><b>N</b></button>
+          <button type="button" onclick="ejecutarComandoConclusion('italic')" class="px-2.5 py-1 text-xs italic bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Cursiva"><i>C</i></button>
+          <button type="button" onclick="ejecutarComandoConclusion('insertUnorderedList')" class="px-2.5 py-1 text-xs bg-white border rounded hover:bg-slate-200 cursor-pointer shadow-sm" title="Viñeta">• Viñeta</button>
         </div>
       </div>
-      <textarea id="conclusion-texto" rows="3" class="w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+      <div id="conclusion-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue" style="min-height: 90px;"></div>
     </section>
 
     <!-- BOTÓN DE GENERAR -->
@@ -275,8 +287,7 @@
 
         <div class="mb-6">
           <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
-          <!-- innerHTML permite renderizar etiquetas <b>, <i>, etc. -->
-          <div id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-arial"></div>
+          <div id="pdf-hallazgos" class="text-xs leading-relaxed text-slate-700 font-arial"></div>
         </div>
 
         <div class="mb-12">
@@ -312,50 +323,35 @@
   <script>
     const plantillas = {
       abdominal: {
-        hallazgos: `- HÍGADO: De forma, tamaño y ecoestructura dentro de límites normales. Bordes regulares, ecogenicidad homogénea. Sin lesiones focales.
-- VESÍCULA BILIAR: Distendida, paredes finas. Luz anecoica, libre de litiasis.
-- VÍAS BILIARES: Calibre normal.
-- PÁNCREAS: Morfología conservada.
-- BAZO: Homogéneo, tamaño normal.
-- RIÑONES: Posición habitual, relación cortico-medular conservada, sin ectasia ni litiasis.`,
+        hallazgos: `<ul><li><b>HÍGADO:</b> De forma, tamaño y ecoestructura dentro de límites normales. Bordes regulares, ecogenicidad homogénea. Sin lesiones focales.</li><li><b>VESÍCULA BILIAR:</b> Distendida, paredes finas. Luz anecoica, libre de litiasis.</li><li><b>VÍAS BILIARES:</b> Calibre normal.</li><li><b>PÁNCREAS:</b> Morfología conservada.</li><li><b>BAZO:</b> Homogéneo, tamaño normal.</li><li><b>RIÑONES:</b> Posición habitual, relación cortico-medular conservada, sin ectasia ni litiasis.</li></ul>`,
         conclusion: `Ecografía Abdominal Superior dentro de parámetros normales.`
       },
       renal: {
-        hallazgos: `- RIÑÓN DERECHO: Dimensiones normales, parénquima de ecoesfera habitual. Sin litiasis ni hidronefrosis.
-- RIÑÓN IZQUIERDO: Sin alteraciones morfo-estructurales evidentes. Ausencia de litiasis.
-- VEJIGA URINARIA: Paredes regulares, adecuada repleción, contenido anecoico libre de ecos en suspensión.`,
+        hallazgos: `<ul><li><b>RIÑÓN DERECHO:</b> Dimensiones normales, parénquima de ecoesfera habitual. Sin litiasis ni hidronefrosis.</li><li><b>RIÑÓN IZQUIERDO:</b> Sin alteraciones morfo-estructurales evidentes. Ausencia de litiasis.</li><li><b>VEJIGA URINARIA:</b> Paredes regulares, adecuada repleción, contenido anecoico libre de ecos en suspensión.</li></ul>`,
         conclusion: `Estudio ecográfico renal y vesical sin alteraciones patológicas visibles.`
       },
       obstetrica: {
-        hallazgos: `- GESTACIÓN: Única, intrauterina.
-- VITALIDAD: Frecuencia cardíaca fetal presente (FCF: _____ lpm).
-- BIOMETRÍA: DBP: ____ mm | LF: ____ mm | CA: ____ mm.
-- LÍQUIDO AMNIÓTICO: Normal.
-- PLACENTA: Ubicación ______, Grado de madurez __.`,
+        hallazgos: `<ul><li><b>GESTACIÓN:</b> Única, intrauterina.</li><li><b>VITALIDAD:</b> Frecuencia cardíaca fetal presente (FCF: _____ lpm).</li><li><b>BIOMETRÍA:</b> DBP: ____ mm | LF: ____ mm | CA: ____ mm.</li><li><b>LÍQUIDO AMNIÓTICO:</b> Normal.</li><li><b>PLACENTA:</b> Ubicación ______, Grado de madurez __.</li></ul>`,
         conclusion: `Gestación intrauterina activa de __ semanas por biometría.`
       }
     };
 
-    // Función para insertar formato (negrita, cursiva, viñetas, listas)
-    window.formatoTexto = function(idElemento, tagInicio, tagFin) {
-      const textarea = document.getElementById(idElemento);
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const textoSeleccionado = textarea.value.substring(start, end);
-      
-      const reemplazo = tagInicio + textoSeleccionado + tagFin;
-      textarea.value = textarea.value.substring(0, start) + reemplazo + textarea.value.substring(end);
-      
-      // Reposicionar el cursor
-      textarea.focus();
-      textarea.setSelectionRange(start + tagInicio.length, end + tagInicio.length);
+    // Funciones para aplicar formato visual instantáneo
+    window.ejecutarComando = function(command) {
+      document.getElementById('hallazgos-texto').focus();
+      document.execCommand(command, false, null);
+    }
+
+    window.ejecutarComandoConclusion = function(command) {
+      document.getElementById('conclusion-texto').focus();
+      document.execCommand(command, false, null);
     }
 
     function cargarPlantilla() {
       const tipo = document.getElementById('select-estudio').value;
       if (plantillas[tipo]) {
-        document.getElementById('hallazgos-texto').value = plantillas[tipo].hallazgos;
-        document.getElementById('conclusion-texto').value = plantillas[tipo].conclusion;
+        document.getElementById('hallazgos-texto').innerHTML = plantillas[tipo].hallazgos;
+        document.getElementById('conclusion-texto').innerHTML = plantillas[tipo].conclusion;
       }
     }
 
@@ -547,8 +543,10 @@
       const fecha = new Date().toLocaleDateString('es-ES');
       const select = document.getElementById('select-estudio');
       const estudio = select.options[select.selectedIndex].text;
-      const hallazgos = document.getElementById('hallazgos-texto').value;
-      const conclusion = document.getElementById('conclusion-texto').value;
+      
+      // Obtener el HTML directamente del editor enriquecido
+      const hallazgos = document.getElementById('hallazgos-texto').innerHTML;
+      const conclusion = document.getElementById('conclusion-texto').innerHTML;
 
       document.getElementById('pdf-nombre').innerText = nombre;
       document.getElementById('pdf-cedula').innerText = cedula;
@@ -556,9 +554,9 @@
       document.getElementById('pdf-fecha').innerText = fecha;
       document.getElementById('pdf-estudio').innerText = estudio;
       
-      // Usar innerHTML para que se interpreten las etiquetas de negrita/cursiva en el PDF
-      document.getElementById('pdf-hallazgos').innerHTML = hallazgos.replace(/\n/g, '<br>');
-      document.getElementById('pdf-conclusion').innerHTML = conclusion.replace(/\n/g, '<br>');
+      // Asignar al PDF manteniendo los formatos visuales, viñetas y listas
+      document.getElementById('pdf-hallazgos').innerHTML = hallazgos;
+      document.getElementById('pdf-conclusion').innerHTML = conclusion;
 
       document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr. (No configurado)';
       document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
