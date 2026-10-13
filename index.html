@@ -104,16 +104,12 @@
               <input type="password" id="reg-pass" placeholder="Contraseña" class="p-2.5 border rounded-xl text-xs">
               <input type="password" id="reg-pass-confirm" placeholder="Repite contraseña" class="p-2.5 border rounded-xl text-xs">
             </div>
-            <div>
-              <label class="block text-xs text-slate-600 mb-1">Foto de Perfil (Opcional)</label>
-              <input type="file" id="reg-foto-file" accept="image/*" class="w-full text-xs text-slate-500">
-            </div>
             <button id="btn-register-submit" class="w-full bg-[#042050] text-white font-bold py-3 rounded-xl text-xs">Completar Registro</button>
             <button type="button" id="link-to-login-1" class="w-full bg-slate-100 text-slate-700 font-semibold py-2 rounded-xl text-xs">Volver</button>
           </div>
         </div>
 
-        <!-- 3. OLVIDÉ MI CONTRASEÑA -->
+        <!-- 3. RECUPERAR CONTRASEÑA -->
         <div id="form-forgot-container" class="hidden">
           <h3 class="text-2xl font-bold mb-2">Recuperar contraseña</h3>
           <input type="email" id="forgot-email" placeholder="Correo registrado" class="w-full p-3 border rounded-xl text-sm mb-4">
@@ -127,18 +123,15 @@
   <!-- APLICACIÓN PRINCIPAL (DASHBOARD) -->
   <div id="app-section" class="hidden min-h-screen flex flex-col md:flex-row relative">
     
-    <!-- BARRA SUPERIOR MÓVIL (MENÚ DESPLEGABLE) -->
+    <!-- BARRA SUPERIOR MÓVIL -->
     <header class="md:hidden bg-[#042050] text-white p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
       <div class="flex items-center gap-2">
         <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" class="w-7 h-7 object-contain" alt="Logo">
         <span class="font-black text-sm tracking-wider">ECOPRAXIS</span>
       </div>
-      <button id="btn-toggle-mobile-menu" class="p-2 rounded-lg bg-white/10 text-white focus:outline-none">
-        ☰
-      </button>
+      <button id="btn-toggle-mobile-menu" class="p-2 rounded-lg bg-white/10 text-white focus:outline-none">☰</button>
     </header>
 
-    <!-- OVERLAY PARA MÓVIL -->
     <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-40 md:hidden"></div>
 
     <!-- BARRA LATERAL (SIDEBAR) -->
@@ -159,8 +152,11 @@
           <button onclick="iniciarNuevoReporteForm()" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
             <span>➕</span> Nuevo Reporte
           </button>
+          <button onclick="cambiarVista('vista-config-reporte', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
+            <span>⚙️</span> Configuración del Reporte
+          </button>
           <button onclick="cambiarVista('vista-configuracion', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
-            <span>⚙️</span> Datos Profesionales
+            <span>👨‍⚕️</span> Datos Profesionales
           </button>
           <button onclick="cambiarVista('vista-perfil', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
             <span>👤</span> Mi Perfil
@@ -168,7 +164,6 @@
         </nav>
       </div>
 
-      <!-- Usuario Abajo -->
       <div class="p-4 border-t border-white/10 space-y-4 bg-black/20">
         <div class="flex items-center gap-3">
           <img id="sidebar-user-img" src="https://via.placeholder.com/150" class="w-10 h-10 rounded-full object-cover border-2 border-blue-400" alt="Avatar">
@@ -186,12 +181,12 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
       
-      <!-- VISTA 1: REGISTROS REALIZADOS -->
+      <!-- VISTA 1: REGISTROS REALIZADOS (Con opción de borrado) -->
       <div id="vista-registros" class="seccion-vista max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-4 md:p-6 border-t-4 border-ecopraxBlue">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b">
           <div>
             <h2 class="text-xl font-black text-ecopraxDark">Registros Realizados</h2>
-            <p class="text-xs text-slate-500">Bandeja de informes ecográficos almacenados.</p>
+            <p class="text-xs text-slate-500">Bandeja de informes ecográficos almacenados en la nube.</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
@@ -206,7 +201,7 @@
             <span class="text-xs text-slate-500 font-semibold ml-2">Acciones:</span>
             <button id="btn-tool-descargar" disabled onclick="accionDescargar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">📥 Descargar PDF</button>
             <button id="btn-tool-editar" disabled onclick="accionEditar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">✏️ Editar</button>
-            <button id="btn-tool-borrar" disabled onclick="accionBorrar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">🗑️ Borrar</button>
+            <button id="btn-tool-borrar" disabled onclick="accionBorrar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">🗑️ Borrar Seleccionados</button>
           </div>
           <span id="contador-seleccionados" class="text-xs font-bold text-slate-500 mr-2">0 seleccionados</span>
         </div>
@@ -322,6 +317,12 @@
             <button onclick="volverAPasoPaciente()" class="text-xs font-semibold text-slate-500 hover:underline">← Modificar Paciente</button>
           </div>
 
+          <!-- SECCIÓN DE TRANSDUCTOR Y VÍA (CUADRO DE TEXTO MODIFICABLE SIN TÍTULO ESTRICTO) -->
+          <div class="mb-4 bg-slate-50 border p-3 rounded-xl">
+            <label class="block text-[11px] font-bold text-slate-600 mb-1 uppercase">Especificaciones del Estudio (Transductor y Vía)</label>
+            <input type="text" id="info-transductor" placeholder="Ej: Transductor Convexo de 3.5 MHz. Abordaje suprapúbico." class="w-full p-2 border rounded-lg text-xs bg-white outline-none focus:ring-2 focus:ring-ecopraxBlue">
+          </div>
+
           <section class="mb-6">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-xs font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase">Hallazgos</h3>
@@ -384,9 +385,70 @@
 
       </div>
 
-      <!-- VISTA 3: CONFIGURACIÓN PROFESIONAL -->
+      <!-- VISTA 3: CONFIGURACIÓN DEL REPORTE (Plantillas por estudio, cabecera e institucional, color de línea) -->
+      <div id="vista-config-reporte" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
+        <h2 class="text-xl font-black text-ecopraxDark mb-2">Configuración del Reporte</h2>
+        <p class="text-xs text-slate-500 mb-6">Personaliza las plantillas por estudio, logos institucionales y diseño de tus reportes.</p>
+        
+        <div class="space-y-6">
+          <!-- 1. PERSONALIZAR PLANTILLAS POR ESTUDIO -->
+          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Plantillas de Hallazgos por Tipo de Estudio</h3>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Seleccione el estudio a configurar</label>
+              <select id="config-select-estudio" onchange="cargarPlantillaEnEditorConfig()" class="w-full p-2.5 border rounded-xl text-xs bg-white font-bold text-ecopraxBlue">
+                <option value="Ecografía Abdominal">Ecografía Abdominal</option>
+                <option value="Ecografía Renal y Vías Urinarias">Ecografía Renal y Vías Urinarias</option>
+                <option value="Ecografía Hepatobiliar">Ecografía Hepatobiliar</option>
+                <option value="Ecografía de Tiroides">Ecografía de Tiroides</option>
+                <option value="Ecografía Inguinal">Ecografía Inguinal</option>
+                <option value="Ecografía de Piel y Partes Blandas">Ecografía de Piel y Partes Blandas</option>
+                <option value="Ecografía Testicular">Ecografía Testicular</option>
+                <option value="Ecografía Pélvica Masculina">Ecografía Pélvica Masculina</option>
+                <option value="Ecografía Pélvica Femenina">Ecografía Pélvica Femenina</option>
+                <option value="Ecografía Transvaginal">Ecografía Transvaginal</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Plantilla Predeterminada de Hallazgos</label>
+              <textarea id="config-plantilla-hallazgos" class="w-full p-3 border rounded-xl text-xs bg-white h-28 outline-none font-arial" placeholder="Escriba la plantilla predeterminada..."></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Conclusión Predeterminada</label>
+              <input type="text" id="config-plantilla-conclusion" class="w-full p-2.5 border rounded-xl text-xs bg-white outline-none" placeholder="Conclusión por defecto...">
+            </div>
+            <button onclick="guardarPlantillaEstudioPersonalizada()" class="bg-ecopraxBlue text-white text-xs font-bold px-4 py-2 rounded-xl">Guardar Plantilla de este Estudio</button>
+          </div>
+
+          <!-- 2. CABECERA INSTITUCIONAL E IMAGEN -->
+          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Cabecera Institucional y Logos Personalizados</h3>
+            <p class="text-[11px] text-slate-500">Sube el logo de la clínica u hospital (opcional) que aparecerá en la cabecera junto a Ecopraxis.</p>
+            <div class="flex items-center gap-4">
+              <input type="file" id="file-logo-institucion" accept="image/*" class="text-xs">
+              <img id="preview-logo-institucion" src="" class="h-12 hidden object-contain border p-1 bg-white rounded" alt="Logo Inst">
+            </div>
+          </div>
+
+          <!-- 3. COLOR DE LÍNEA DIVISORIA -->
+          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
+            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Color de la Línea Divisoria del Informe</h3>
+            <p class="text-[11px] text-slate-500">Elige el color para la línea que separa la cabecera del cuerpo del informe impreso.</p>
+            <div class="flex items-center gap-3">
+              <input type="color" id="input-color-linea" value="#042050" class="w-12 h-10 border rounded-lg cursor-pointer p-1 bg-white">
+              <span class="text-xs font-bold text-slate-700" id="label-color-val">#042050</span>
+            </div>
+          </div>
+
+          <button onclick="guardarConfiguracionReporteGeneral()" class="w-full bg-[#042050] text-white font-bold py-3 rounded-xl text-xs shadow-md">
+            Guardar Toda la Configuración del Reporte
+          </button>
+        </div>
+      </div>
+
+      <!-- VISTA 4: DATOS PROFESIONALES -->
       <div id="vista-configuracion" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
-        <h2 class="text-xl font-black text-ecopraxDark mb-4">Configuración Profesional</h2>
+        <h2 class="text-xl font-black text-ecopraxDark mb-4">Datos Profesionales</h2>
         <div class="space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input type="text" id="med-nombre" placeholder="Nombre con Título (Ej: Dr. Fabián Semprun)" class="p-2.5 border rounded-lg text-xs">
@@ -394,7 +456,7 @@
           </div>
           <div class="border p-3 rounded-lg">
             <label class="flex items-center gap-2 cursor-pointer mb-2">
-              <input type="checkbox" id="check-colegiado" class="w-4 h-4 text-ecopraxBlue">
+              <input type="checkbox" id="check-colegiado" onchange="document.getElementById('container-cmv').classList.toggle('hidden', !this.checked)" class="w-4 h-4 text-ecopraxBlue">
               <span class="text-xs font-bold">¿Posee Nro. de Colegiado / C.M.V.?</span>
             </label>
             <div id="container-cmv" class="hidden">
@@ -413,11 +475,11 @@
               <img id="preview-firma" src="" class="h-16 mx-auto mt-2 hidden object-contain" alt="Firma">
             </div>
           </div>
-          <button id="btn-guardar-perfil" class="bg-ecopraxBlue text-white text-xs font-bold px-5 py-2.5 rounded-lg">Guardar Cambios</button>
+          <button id="btn-guardar-perfil" onclick="guardarDatosProfesionales()" class="bg-ecopraxBlue text-white text-xs font-bold px-5 py-2.5 rounded-lg">Guardar Cambios</button>
         </div>
       </div>
 
-      <!-- VISTA 4: MI PERFIL -->
+      <!-- VISTA 5: MI PERFIL -->
       <div id="vista-perfil" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
         <h2 class="text-xl font-black text-ecopraxDark mb-4">Mi Perfil Profesional</h2>
         <div class="space-y-6">
@@ -426,11 +488,9 @@
             <div class="space-y-2">
               <h3 id="profile-view-name" class="text-lg font-bold text-ecopraxDark">Dr. (Cargando...)</h3>
               <p id="profile-view-email" class="text-xs text-slate-600">correo@ejemplo.com</p>
-              <input type="file" id="file-perfil" accept="image/*" class="text-xs">
             </div>
           </div>
 
-          <!-- CAMBIO DE CONTRASEÑA -->
           <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
             <h3 class="text-xs font-bold uppercase text-ecopraxDark">Seguridad y Contraseña</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -455,9 +515,7 @@
         <button onclick="cerrarModalPacientes()" class="text-xs font-bold text-slate-500">✕ Cerrar</button>
       </div>
       <input type="text" id="input-buscar-modal" onkeyup="filtrarPacientesModal()" placeholder="🔍 Buscar por nombre o cédula..." class="w-full p-2.5 border rounded-xl text-xs mb-3 bg-slate-50 outline-none">
-      <div id="lista-pacientes-modal" class="max-h-64 overflow-y-auto space-y-2">
-        <!-- Cargado dinámicamente -->
-      </div>
+      <div id="lista-pacientes-modal" class="max-h-64 overflow-y-auto space-y-2"></div>
     </div>
   </div>
 
@@ -474,9 +532,11 @@
       </div>
 
       <div id="planilla-imprimible">
-        <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
-          <div class="flex items-center gap-2">
+        <!-- CABECERA CON LÍNEA DIVISORIA DINÁMICA Y LOGO INSTITUCIONAL OPCIONAL -->
+        <div id="pdf-header-container" class="flex justify-between items-center pb-4 mb-6 border-b-2" style="border-color: #042050;">
+          <div class="flex items-center gap-3">
             <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
+            <img id="pdf-img-institucion" src="" class="w-8 h-8 object-contain hidden" alt="Logo Inst">
             <div>
               <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
               <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
@@ -489,13 +549,18 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6 font-arial">
+        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-4 font-arial">
           <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
           <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
           <p><strong>Edad / Sexo:</strong> <span id="pdf-edad-sexo"></span></p>
           <p><strong>Teléfono:</strong> <span id="pdf-telefono"></span></p>
           <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
           <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
+        </div>
+
+        <!-- SECCIÓN TRANSDUCTOR Y VÍA (SIN TÍTULO ESTRICTO) -->
+        <div id="pdf-container-transductor" class="mb-4 text-xs italic text-slate-600 bg-slate-100 p-2 rounded">
+          <span id="pdf-transductor"></span>
         </div>
 
         <div class="mb-4">
@@ -561,14 +626,14 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let medicoActualDatos = { selloUrl: '', firmaUrl: '', perfilUrl: '' };
-    let tempFotoBase64 = '';
+    let medicoActualDatos = { selloUrl: '', firmaUrl: '', perfilUrl: '', logoInstUrl: '', colorLinea: '#042050', plantillasEstudios: {} };
     let examenesListaGlobal = [];
     let examenEditandoId = null;
 
-    const plantillasEstudios = {
+    // Plantillas por defecto robustas
+    let plantillasPorDefecto = {
       "Ecografía Abdominal": {
-        hallazgos: "<ul><li><b>HÍGADO:</b> Forma, tamaño y ecoestructura normales. Sin lesiones focales.</li><li><b>VESÍCULA BILIAR:</b> Paredes finas, luz anecoica libre de litiasis.</li><li><b>RIÑONES:</b> Morfología conservada, sin ectasia ni litiasis.</li></ul>",
+        hallazgos: "<ul><li><b>HÍGADO:</b> Forma, tamaño y ecoestructura normales. Sin lesiones focales.</li><li><b>VESÍCULA BILIAR:</b> Paredes finas, luz anecoica libre de litiasis.</li><li><b>PÁNCREAS Y BAZO:</b> Sin alteraciones ecográficas visibles.</li><li><b>RIÑONES:</b> Morfología conservada, sin ectasia ni litiasis.</li></ul>",
         conclusion: "Ecografía Abdominal dentro de parámetros normales."
       },
       "Ecografía Renal y Vías Urinarias": {
@@ -607,7 +672,6 @@
       }
     }
 
-    // INICIAR NUEVO REPORTE CON CAMPOS VACÍOS Y PLACEHOLDERS
     window.iniciarNuevoReporteForm = function() {
       examenEditandoId = null;
       document.getElementById('pac-nombre').value = "";
@@ -625,6 +689,7 @@
       document.getElementById('container-fecha-manual').classList.add('hidden');
       document.getElementById('pac-fecha-manual').value = "";
 
+      document.getElementById('info-transductor').value = "Transductor Convexo de 3.5 MHz. Abordaje convencional.";
       document.getElementById('hallazgos-texto').innerHTML = "";
       document.getElementById('conclusion-texto').innerHTML = "";
       document.getElementById('check-observaciones').checked = false;
@@ -648,7 +713,7 @@
       document.getElementById(idContainer).classList.toggle('hidden', !check.checked);
     }
 
-    // GUARDAR PACIENTE Y PASAR A PASO 2
+    // GUARDAR PACIENTE Y CARGAR PLANTILLA DINÁMICA DEL ESTUDIO SELECCIONADO
     window.guardarPacienteYContinuar = function() {
       const nom = document.getElementById('pac-nombre').value.trim();
       const ape = document.getElementById('pac-apellido').value.trim();
@@ -664,9 +729,14 @@
 
       const hallazgosElem = document.getElementById('hallazgos-texto');
       const conclusionElem = document.getElementById('conclusion-texto');
-      if (!hallazgosElem.innerHTML && plantillasEstudios[estudio]) {
-        hallazgosElem.innerHTML = plantillasEstudios[estudio].hallazgos;
-        conclusionElem.innerHTML = plantillasEstudios[estudio].conclusion;
+
+      // Buscar si el médico tiene plantilla guardada para este estudio, sino usar por defecto
+      const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
+      const plantillaActual = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { hallazgos: "Escriba aquí los hallazgos...", conclusion: "Conclusión diagnóstica." };
+
+      if (!hallazgosElem.innerHTML.trim() || examenEditandoId === null) {
+        hallazgosElem.innerHTML = plantillaActual.hallazgos;
+        conclusionElem.innerHTML = plantillaActual.conclusion;
       }
 
       document.getElementById('paso-paciente').classList.add('hidden');
@@ -678,10 +748,70 @@
       document.getElementById('paso-paciente').classList.remove('hidden');
     }
 
-    // PACIENTES YA REGISTRADOS MODAL
+    // GESTIÓN DE PLANTILLAS EN CONFIGURACIÓN DE REPORTE
+    window.cargarPlantillaEnEditorConfig = function() {
+      const estudio = document.getElementById('config-select-estudio').value;
+      const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
+      const plantilla = plantillasGuardadas[estudio] || plantillasPorDefecto[estudio] || { hallazgos: "", conclusion: "" };
+
+      document.getElementById('config-plantilla-hallazgos').value = plantilla.hallazgos;
+      document.getElementById('config-plantilla-conclusion').value = plantilla.conclusion;
+    }
+
+    window.guardarPlantillaEstudioPersonalizada = async function() {
+      const estudio = document.getElementById('config-select-estudio').value;
+      const hall = document.getElementById('config-plantilla-hallazgos').value;
+      const conc = document.getElementById('config-plantilla-conclusion').value;
+
+      if (!medicoActualDatos.plantillasEstudios) {
+        medicoActualDatos.plantillasEstudios = {};
+      }
+      medicoActualDatos.plantillasEstudios[estudio] = { hallazgos: hall, conclusion: conc };
+
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, "medicos", user.uid), {
+          plantillasEstudios: medicoActualDatos.plantillasEstudios
+        });
+        alert(`¡Plantilla para "${estudio}" guardada con éxito!`);
+      }
+    }
+
+    window.guardarConfiguracionReporteGeneral = async function() {
+      const colorLinea = document.getElementById('input-color-linea').value;
+      const fileLogoInst = document.getElementById('file-logo-institucion').files[0];
+
+      let logoInstUrl = medicoActualDatos.logoInstUrl || '';
+      if (fileLogoInst) {
+        logoInstUrl = await convertirFileBase64(fileLogoInst);
+      }
+
+      medicoActualDatos.colorLinea = colorLinea;
+      medicoActualDatos.logoInstUrl = logoInstUrl;
+
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, "medicos", user.uid), {
+          colorLinea: colorLinea,
+          logoInstUrl: logoInstUrl
+        });
+        alert("¡Configuración del reporte actualizada con éxito!");
+      }
+    }
+
+    // CONVERTIR IMAGEN A BASE64 PARA FIRESTORE
+    function convertirFileBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // PACIENTES YA REGISTRADOS Y BORRADO DE REGISTROS
     window.abrirModalPacientesRegistrados = function() {
-      const modal = document.getElementById('modal-pacientes');
-      modal.classList.remove('hidden');
+      document.getElementById('modal-pacientes').classList.remove('hidden');
       renderizarListaPacientesModal(examenesListaGlobal);
     }
     window.cerrarModalPacientes = function() {
@@ -691,10 +821,7 @@
     function renderizarListaPacientesModal(lista) {
       const contenedor = document.getElementById('lista-pacientes-modal');
       contenedor.innerHTML = "";
-      
-      // Obtener pacientes únicos por cédula
-      const unicos = Array.from(new Set(lista.map(a => a.pacienteCedula)))
-        .map(ced => lista.find(a => a.pacienteCedula === ced));
+      const unicos = Array.from(new Set(lista.map(a => a.pacienteCedula))).map(ced => lista.find(a => a.pacienteCedula === ced));
 
       if (unicos.length === 0) {
         contenedor.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">No hay pacientes previos registrados.</p>`;
@@ -726,18 +853,15 @@
     window.seleccionarPacientePrevio = function(id) {
       const p = examenesListaGlobal.find(item => item.id === id);
       if (!p) return;
-
       document.getElementById('pac-nombre').value = p.pacienteNombre || '';
       document.getElementById('pac-apellido').value = p.pacienteApellido || '';
       document.getElementById('pac-cedula').value = p.pacienteCedula || '';
       document.getElementById('pac-edad').value = p.pacienteEdad || '';
       document.getElementById('pac-telefono').value = p.pacienteTelefono || '';
       document.getElementById('pac-sexo').value = p.pacienteSexo || 'Femenino';
-
       cerrarModalPacientes();
     }
 
-    // CARGAR Y RENDERIZAR TABLA DE REGISTROS
     async function cargarRegistros(uid) {
       const tbody = document.getElementById('tabla-registros-body');
       tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center italic text-slate-400">Cargando registros...</td></tr>`;
@@ -746,11 +870,9 @@
         const q = query(collection(db, "examenes"), where("medicoUid", "==", uid));
         const snapshot = await getDocs(q);
         examenesListaGlobal = [];
-
         snapshot.forEach(docSnap => {
           examenesListaGlobal.push({ id: docSnap.id, ...docSnap.data() });
         });
-
         renderizarTabla(examenesListaGlobal);
       } catch (e) {
         console.error("Error al cargar registros:", e);
@@ -786,14 +908,12 @@
     window.filtrarTabla = function() {
       const texto = document.getElementById('input-buscar').value.toLowerCase();
       const fecha = document.getElementById('filtro-fecha').value;
-
       const filtrados = examenesListaGlobal.filter(item => {
         const coincideNombre = `${item.pacienteNombre} ${item.pacienteApellido}`.toLowerCase().includes(texto);
         const coincideCedula = item.pacienteCedula.toLowerCase().includes(texto);
         const coincideFecha = !fecha || item.fechaISO === fecha;
         return (coincideNombre || coincideCedula) && coincideFecha;
       });
-
       renderizarTabla(filtrados);
     }
 
@@ -824,7 +944,6 @@
         if (count === 1) {
           btnDescargar.disabled = false;
           btnDescargar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-ecopraxLight text-ecopraxBlue border border-blue-200 hover:bg-blue-100 cursor-pointer transition";
-          
           btnEditar.disabled = false;
           btnEditar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition";
         } else {
@@ -849,7 +968,6 @@
       document.getElementById('modal-preview').classList.remove('hidden');
     }
 
-    // AL EDITAR: BLOQUEAR TIPO DE ESTUDIO
     window.accionEditar = function() {
       const selectedId = document.querySelector('.check-item:checked').value;
       const item = examenesListaGlobal.find(e => e.id === selectedId);
@@ -865,8 +983,9 @@
       
       const selectEstudio = document.getElementById('pac-estudio');
       selectEstudio.value = item.estudioTipo;
-      selectEstudio.disabled = true; // Bloqueado al editar
+      selectEstudio.disabled = true;
 
+      document.getElementById('info-transductor').value = item.transductor || '';
       document.getElementById('hallazgos-texto').innerHTML = item.hallazgos || '';
       document.getElementById('conclusion-texto').innerHTML = item.conclusion || '';
 
@@ -887,7 +1006,7 @@
 
     window.accionBorrar = async function() {
       const seleccionados = Array.from(document.querySelectorAll('.check-item:checked')).map(c => c.value);
-      if (!confirm(`¿Está seguro de eliminar ${seleccionados.length} registro(s)?`)) return;
+      if (!confirm(`¿Está seguro de eliminar ${seleccionados.length} registro(s) de la base de datos?`)) return;
 
       try {
         for (const id of seleccionados) {
@@ -908,6 +1027,7 @@
       const tel = document.getElementById('pac-telefono').value.trim();
       const sexo = document.getElementById('pac-sexo').value;
       const estudio = document.getElementById('pac-estudio').value;
+      const transductor = document.getElementById('info-transductor').value;
       
       let fechaStr;
       const checkManual = document.getElementById('check-fecha-manual').checked;
@@ -932,6 +1052,7 @@
         pacienteTelefono: tel,
         pacienteSexo: sexo,
         estudioTipo: estudio,
+        transductor: transductor,
         fechaStr: fechaStr,
         hallazgos: hallazgos,
         conclusion: conclusion,
@@ -950,6 +1071,7 @@
       document.getElementById('pdf-telefono').innerText = item.pacienteTelefono || 'N/A';
       document.getElementById('pdf-fecha').innerText = item.fechaStr;
       document.getElementById('pdf-estudio').innerText = item.estudioTipo;
+      document.getElementById('pdf-transductor').innerText = item.transductor || '';
       document.getElementById('pdf-hallazgos').innerHTML = item.hallazgos;
       document.getElementById('pdf-conclusion').innerHTML = item.conclusion;
 
@@ -973,13 +1095,25 @@
         document.getElementById('pdf-medico-cmv').innerText = `CMV: ${medicoActualDatos.cmv}`;
       }
 
+      // Aplicar color de línea personalizado
+      const colorLinea = medicoActualDatos.colorLinea || '#042050';
+      document.getElementById('pdf-header-container').style.borderColor = colorLinea;
+
+      // Logo institucional
+      const imgInst = document.getElementById('pdf-img-institucion');
+      if (medicoActualDatos.logoInstUrl) {
+        imgInst.src = medicoActualDatos.logoInstUrl;
+        imgInst.classList.remove('hidden');
+      } else {
+        imgInst.classList.add('hidden');
+      }
+
       const imgSello = document.getElementById('pdf-img-sello');
       if (medicoActualDatos.selloUrl) { imgSello.src = medicoActualDatos.selloUrl; imgSello.classList.remove('hidden'); }
       const imgFirma = document.getElementById('pdf-img-firma');
       if (medicoActualDatos.firmaUrl) { imgFirma.src = medicoActualDatos.firmaUrl; imgFirma.classList.remove('hidden'); }
     }
 
-    // GUARDAR E IMPRIMIR / DESCARGAR PDF CON NOMBRE PERSONALIZADO Y RETORNO A REGISTROS
     window.guardarYGenerarPDF = async function() {
       const nom = document.getElementById('pac-nombre').value.trim();
       const ape = document.getElementById('pac-apellido').value.trim();
@@ -988,6 +1122,7 @@
       const tel = document.getElementById('pac-telefono').value.trim();
       const sexo = document.getElementById('pac-sexo').value;
       const estudio = document.getElementById('pac-estudio').value;
+      const transductor = document.getElementById('info-transductor').value;
 
       let fechaStr, fechaISO;
       const checkManual = document.getElementById('check-fecha-manual').checked;
@@ -1018,6 +1153,7 @@
           pacienteTelefono: tel,
           pacienteSexo: sexo,
           estudioTipo: estudio,
+          transductor: transductor,
           fechaStr: fechaStr,
           fechaISO: fechaISO,
           hallazgos: hallazgos,
@@ -1035,12 +1171,10 @@
         cargarRegistros(user.uid);
       }
 
-      // Generar descarga automática con nombre cedula_nombre_apellido.pdf
       const nombreLimpioNom = nom.toLowerCase().replace(/\s+/g, '_');
       const nombreLimpioApe = ape.toLowerCase().replace(/\s+/g, '_');
       const nombreArchivo = `${ced}_${nombreLimpioNom}_${nombreLimpioApe}.pdf`;
 
-      // Simular descarga cambiando título de página temporalmente para impresión a PDF limpia
       const originalTitle = document.title;
       document.title = nombreArchivo;
       window.print();
@@ -1054,7 +1188,35 @@
       document.getElementById('modal-preview').classList.add('hidden');
     }
 
-    // CAMBIAR CONTRASEÑA EN MI PERFIL
+    window.guardarDatosProfesionales = async function() {
+      const nombre = document.getElementById('med-nombre').value.trim();
+      const mpps = document.getElementById('med-mpps').value.trim();
+      const tieneColegiado = document.getElementById('check-colegiado').checked;
+      const cmv = document.getElementById('med-cmv').value.trim();
+      
+      const fileSello = document.getElementById('file-sello').files[0];
+      const fileFirma = document.getElementById('file-firma').files[0];
+
+      let selloUrl = medicoActualDatos.selloUrl || '';
+      let firmaUrl = medicoActualDatos.firmaUrl || '';
+
+      if (fileSello) selloUrl = await convertirFileBase64(fileSello);
+      if (fileFirma) firmaUrl = await convertirFileBase64(fileFirma);
+
+      const user = auth.currentUser;
+      if (user) {
+        await updateDoc(doc(db, "medicos", user.uid), {
+          nombre: nombre,
+          mpps: mpps,
+          tieneColegiado: tieneColegiado,
+          cmv: cmv,
+          selloUrl: selloUrl,
+          firmaUrl: firmaUrl
+        });
+        alert("¡Datos profesionales guardados correctamente!");
+      }
+    }
+
     window.cambiarPasswordPerfil = async function() {
       const p1 = document.getElementById('perfil-nueva-pass').value;
       const p2 = document.getElementById('perfil-confirma-pass').value;
@@ -1076,12 +1238,11 @@
           document.getElementById('perfil-nueva-pass').value = "";
           document.getElementById('perfil-confirma-pass').value = "";
         } catch (e) {
-          alert("Error al actualizar contraseña (es posible que debas volver a iniciar sesión por seguridad): " + e.message);
+          alert("Error al actualizar contraseña: " + e.message);
         }
       }
     }
 
-    // COMANDOS EDITORES
     window.ejecutarComando = function(command) {
       document.getElementById('hallazgos-texto').focus();
       document.execCommand(command, false, null);
@@ -1123,6 +1284,10 @@
         document.getElementById('form-login-container').classList.remove('hidden');
       });
 
+      document.getElementById('input-color-linea')?.addEventListener('input', (e) => {
+        document.getElementById('label-color-val').innerText = e.target.value;
+      });
+
       document.getElementById('btn-login')?.addEventListener('click', async () => {
         const email = document.getElementById('login-email').value.trim();
         const pass = document.getElementById('login-pass').value;
@@ -1149,7 +1314,10 @@
               mpps: '',
               tieneColegiado: false,
               cmv: '',
-              perfilUrl: ''
+              perfilUrl: '',
+              logoInstUrl: '',
+              colorLinea: '#042050',
+              plantillasEstudios: {}
             });
             alert("¡Registro exitoso!");
           } catch (e) { alert("Error: " + e.message); }
@@ -1175,11 +1343,17 @@
             document.getElementById('profile-view-email').innerText = user.email;
             document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
             document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
-
-            if (medicoActualDatos.perfilUrl) {
-              document.getElementById('sidebar-user-img').src = medicoActualDatos.perfilUrl;
-              document.getElementById('profile-view-img').src = medicoActualDatos.perfilUrl;
+            document.getElementById('med-cmv').value = medicoActualDatos.cmv || '';
+            if (medicoActualDatos.tieneColegiado) {
+              document.getElementById('check-colegiado').checked = true;
+              document.getElementById('container-cmv').classList.remove('hidden');
             }
+            if (medicoActualDatos.colorLinea) {
+              document.getElementById('input-color-linea').value = medicoActualDatos.colorLinea;
+              document.getElementById('label-color-val').innerText = medicoActualDatos.colorLinea;
+            }
+
+            cargarPlantillaEnEditorConfig();
           }
         } catch (e) { console.error(e); }
 
