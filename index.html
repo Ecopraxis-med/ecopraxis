@@ -22,7 +22,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // ⚠️ MANTÉN AQUÍ TUS CREDENCIALES REALES DE FIREBASE
     const firebaseConfig = {
@@ -87,7 +87,6 @@
         document.getElementById('app-section').classList.remove('hidden');
         document.getElementById('user-email-display').innerText = user.email;
         
-        // Cargar perfil del médico
         const docRef = doc(db, "medicos", user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
@@ -95,7 +94,6 @@
           document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
           document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
           
-          // Manejar estado del Colegiado
           if (medicoActualDatos.tieneColegiado) {
             document.getElementById('check-colegiado').checked = true;
             document.getElementById('container-cmv').classList.remove('hidden');
@@ -121,7 +119,6 @@
       }
     });
 
-    // Controlar visibilidad del input de Colegiado
     window.toggleColegiado = function() {
       const isChecked = document.getElementById('check-colegiado').checked;
       const container = document.getElementById('container-cmv');
@@ -133,7 +130,6 @@
       }
     };
 
-    // Subida y procesamiento de la imagen del Sello
     window.procesarSello = function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -148,7 +144,6 @@
       reader.readAsDataURL(file);
     };
 
-    // Subida y procesamiento de la Firma (Fondo transparente automático)
     window.procesarFirma = function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -171,7 +166,7 @@
             const g = data[i + 1];
             const b = data[i + 2];
             if (r > 200 && g > 200 && b > 200) {
-              data[i + 3] = 0; // Transparente
+              data[i + 3] = 0;
             }
           }
 
@@ -206,12 +201,30 @@
         alert("Error al guardar perfil: " + error.message);
       }
     };
+
+    // Guardar examen en la base de datos de Firebase
+    window.guardarExamenEnBD = async function(examen) {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        await addDoc(collection(db, "examenes"), {
+          ...examen,
+          medicoUid: user.uid,
+          medicoNombre: medicoActualDatos.nombre || user.email,
+          fechaServidor: serverTimestamp()
+        });
+      } catch (e) {
+        console.error("Error al guardar en historial: ", e);
+      }
+    };
   </script>
+
   <style>
     @media print {
       body * { visibility: hidden; }
-      #pdf-container, #pdf-container * { visibility: visible; }
-      #pdf-container { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+      #modal-preview, #modal-preview * { visibility: visible; }
+      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
+      .no-print-modal { display: none !important; }
     }
   </style>
 </head>
@@ -267,7 +280,7 @@
           </div>
         </div>
 
-        <!-- SECCIÓN COLEGIADO OPCIONAL -->
+        <!-- COLEGIADO OPCIONAL -->
         <div class="border p-3 rounded-lg bg-white">
           <label class="flex items-center gap-2 cursor-pointer mb-2">
             <input type="checkbox" id="check-colegiado" onchange="toggleColegiado()" class="w-4 h-4 text-ecopraxBlue rounded">
@@ -352,56 +365,73 @@
       <textarea id="conclusion-texto" rows="3" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
     </section>
 
-    <!-- BOTÓN -->
+    <!-- BOTÓN DE GENERAR -->
     <div class="flex justify-end pt-4 border-t">
-      <button onclick="imprimirPDF()" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm transition shadow-lg flex items-center gap-2">
-        <span>📄 Generar Informe PDF</span>
+      <button onclick="generarVistaPrevia()" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm transition shadow-lg flex items-center gap-2">
+        <span>👁️ Ver Planilla y Generar PDF</span>
       </button>
     </div>
 
   </div>
 
-  <!-- PDF -->
-  <div id="pdf-container" class="hidden p-8 bg-white max-w-2xl mx-auto">
-    <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
-      <div>
-        <h1 class="text-xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
-        <p class="text-[10px] text-slate-500 uppercase">Servicio de Ecografía Clínica</p>
+  <!-- MODAL DE VISTA PREVIA Y PLANILLA FINAL PARA IMPRIMIR -->
+  <div id="modal-preview" class="hidden fixed inset-0 bg-slate-900/70 z-50 overflow-y-auto p-4 md:p-10 flex justify-center items-start">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative my-6">
+      
+      <!-- Botones de Acción del Modal (No salen en el PDF) -->
+      <div class="flex justify-between items-center pb-4 mb-6 border-b no-print-modal">
+        <span class="text-xs font-bold text-slate-500 uppercase">Vista Previa de Informe</span>
+        <div class="flex gap-2">
+          <button onclick="ejecutarImpresion()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow">🖨️ Imprimir / Guardar PDF</button>
+          <button onclick="cerrarVistaPrevia()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg transition">✕ Cerrar</button>
+        </div>
       </div>
-      <div class="text-right text-xs">
-        <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
-        <p class="text-slate-500" id="pdf-medico-mpps"></p>
-        <p class="text-slate-500" id="pdf-medico-cmv"></p>
+
+      <!-- FORMATO DE PLANILLA MÉDICA -->
+      <div id="planilla-imprimible">
+        <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
+          <div>
+            <h1 class="text-xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
+          </div>
+          <div class="text-right text-xs">
+            <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
+            <p class="text-slate-500" id="pdf-medico-mpps"></p>
+            <p class="text-slate-500" id="pdf-medico-cmv"></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6">
+          <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
+          <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
+          <p><strong>Edad:</strong> <span id="pdf-edad"></span></p>
+          <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
+          <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
+          <p id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-mono"></p>
+        </div>
+
+        <div class="mb-12">
+          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
+          <p id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-mono"></p>
+        </div>
+
+        <!-- SELLO Y FIRMA -->
+        <div class="flex justify-between items-end mt-16 pt-4">
+          <div class="text-center w-40">
+            <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
+            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
+          </div>
+          <div class="text-center w-40">
+            <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden object-contain" alt="Firma">
+            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6">
-      <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
-      <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
-      <p><strong>Edad:</strong> <span id="pdf-edad"></span></p>
-      <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
-      <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
-    </div>
-
-    <div class="mb-6">
-      <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
-      <p id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-mono"></p>
-    </div>
-
-    <div class="mb-12">
-      <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
-      <p id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-mono"></p>
-    </div>
-
-    <div class="flex justify-between items-end mt-16 pt-4">
-      <div class="text-center w-40">
-        <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
-        <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
-      </div>
-      <div class="text-center w-40">
-        <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden object-contain" alt="Firma">
-        <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
-      </div>
     </div>
   </div>
 
@@ -438,21 +468,27 @@
       document.getElementById('conclusion-texto').value = plantillas[tipo].conclusion;
     }
 
-    function imprimirPDF() {
-      document.getElementById('pdf-nombre').innerText = document.getElementById('paciente-nombre').value || 'N/A';
-      document.getElementById('pdf-cedula').innerText = document.getElementById('paciente-cedula').value || 'N/A';
-      document.getElementById('pdf-edad').innerText = document.getElementById('paciente-edad').value || 'N/A';
-      document.getElementById('pdf-fecha').innerText = new Date().toLocaleDateString('es-ES');
-      
+    function generarVistaPrevia() {
+      const nombre = document.getElementById('paciente-nombre').value || 'N/A';
+      const cedula = document.getElementById('paciente-cedula').value || 'N/A';
+      const edad = document.getElementById('paciente-edad').value || 'N/A';
+      const fecha = new Date().toLocaleDateString('es-ES');
       const select = document.getElementById('select-estudio');
-      document.getElementById('pdf-estudio').innerText = select.options[select.selectedIndex].text;
-      document.getElementById('pdf-hallazgos').innerText = document.getElementById('hallazgos-texto').value;
-      document.getElementById('pdf-conclusion').innerText = document.getElementById('conclusion-texto').value;
+      const estudio = select.options[select.selectedIndex].text;
+      const hallazgos = document.getElementById('hallazgos-texto').value;
+      const conclusion = document.getElementById('conclusion-texto').value;
+
+      document.getElementById('pdf-nombre').innerText = nombre;
+      document.getElementById('pdf-cedula').innerText = cedula;
+      document.getElementById('pdf-edad').innerText = edad;
+      document.getElementById('pdf-fecha').innerText = fecha;
+      document.getElementById('pdf-estudio').innerText = estudio;
+      document.getElementById('pdf-hallazgos').innerText = hallazgos;
+      document.getElementById('pdf-conclusion').innerText = conclusion;
 
       document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr. (No configurado)';
       document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
       
-      // Mostrar CMV solo si está marcado y configurado
       if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
         document.getElementById('pdf-medico-cmv').innerText = `CMV: ${medicoActualDatos.cmv}`;
       } else {
@@ -475,6 +511,26 @@
         imgFirma.classList.add('hidden');
       }
 
+      // Guardar automáticamente en el historial de Firebase
+      window.guardarExamenEnBD({
+        pacienteNombre: nombre,
+        pacienteCedula: cedula,
+        pacienteEdad: edad,
+        estudioTipo: estudio,
+        hallazgos: hallazgos,
+        conclusion: conclusion,
+        fechaStr: fecha
+      });
+
+      // Mostrar la vista previa en pantalla
+      document.getElementById('modal-preview').classList.remove('hidden');
+    }
+
+    function cerrarVistaPrevia() {
+      document.getElementById('modal-preview').classList.add('hidden');
+    }
+
+    function ejecutarImpresion() {
       window.print();
     }
 
