@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECOPRAXIS - Ecografía Práctica | Generador de Informes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Configuración de colores personalizados basados en el logotipo de ECOPRAXIS -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ecopraxDark: '#0b1d3a', // Azul marino oscuro del logotipo
+            ecopraxBlue: '#0084ff', // Azul brillante/cian del transductor
+            ecopraxLight: '#eef6ff', // Fondo suave complementario
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // ⚠️ REEMPLAZA CON TUS CREDENCIALES DE FIREBASE
+    const firebaseConfig = {
+    apiKey: "AIzaSyBDWqtkoFIjwnfmvxEb7e1jNxyko43FRVc",
+    authDomain: "ecopraxis-d12fd.firebaseapp.com",
+    projectId: "ecopraxis-d12fd",
+    storageBucket: "ecopraxis-d12fd.firebasestorage.app",
+    messagingSenderId: "242952378160",
+    appId: "1:242952378160:web:aed47838b8b71dfe731af5",
+    measurementId: "G-RFF4R8Y6EP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let medicoActualDatos = {};
+
+    window.registrarUsuario = async function() {
+      const email = document.getElementById('auth-email').value;
+      const pass = document.getElementById('auth-pass').value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        alert("¡Registro exitoso en ECOPRAXIS!");
+      } catch (error) {
+        alert("Error al registrarse: " + error.message);
+      }
+    };
+
+    window.iniciarSesion = async function() {
+      const email = document.getElementById('auth-email').value;
+      const pass = document.getElementById('auth-pass').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (error) {
+        alert("Error al iniciar sesión: " + error.message);
+      }
+    };
+
+    window.cerrarSesion = async function() {
+      await signOut(auth);
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        document.getElementById('auth-section').classList.add('hidden');
+        document.getElementById('app-section').classList.remove('hidden');
+        document.getElementById('user-email-display').innerText = user.email;
+        
+        // Cargar perfil del médico
+        const docRef = doc(db, "medicos", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          medicoActualDatos = docSnap.data();
+          document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
+          document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
+          document.getElementById('med-cmv').value = medicoActualDatos.cmv || '';
+          document.getElementById('med-firma-url').value = medicoActualDatos.firmaUrl || '';
+          document.getElementById('med-sello-url').value = medicoActualDatos.selloUrl || '';
+        }
+      } else {
+        document.getElementById('auth-section').classList.remove('hidden');
+        document.getElementById('app-section').classList.add('hidden');
+      }
+    });
+
+    window.guardarPerfilMedico = async function() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      medicoActualDatos = {
+        nombre: document.getElementById('med-nombre').value,
+        mpps: document.getElementById('med-mpps').value,
+        cmv: document.getElementById('med-cmv').value,
+        firmaUrl: document.getElementById('med-firma-url').value,
+        selloUrl: document.getElementById('med-sello-url').value
+      };
+
+      try {
+        await setDoc(doc(db, "medicos", user.uid), medicoActualDatos);
+        alert("¡Perfil profesional guardado con éxito!");
+      } catch (error) {
+        alert("Error al guardar perfil: " + error.message);
+      }
+    };
+  </script>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #pdf-container, #pdf-container * { visibility: visible; }
+      #pdf-container { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen p-4 md:p-8">
+
+  <!-- LOGIN / REGISTRO -->
+  <div id="auth-section" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-8 mt-12 border-t-4 border-ecopraxBlue">
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-extrabold text-ecopraxDark tracking-wide">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+      <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Ecografía Práctica</p>
+    </div>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico</label>
+        <input type="email" id="auth-email" placeholder="medico@ecopraxis.com" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Contraseña</label>
+        <input type="password" id="auth-pass" placeholder="••••••••" class="w-full p-3 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button onclick="iniciarSesion()" class="flex-1 bg-ecopraxDark hover:bg-slate-800 text-white font-medium py-3 rounded-xl text-sm transition shadow-md">Iniciar Sesión</button>
+        <button onclick="registrarUsuario()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-3 rounded-xl text-sm transition">Registrarse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div id="app-section" class="hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-10 border-t-4 border-ecopraxBlue">
+    
+    <!-- Cabecera -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6 gap-4">
+      <div>
+        <h1 class="text-2xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+        <p class="text-xs text-slate-500">Sesión de: <span id="user-email-display" class="font-semibold text-ecopraxBlue"></span></p>
+      </div>
+      <button onclick="cerrarSesion()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-bold transition">Cerrar Sesión</button>
+    </div>
+
+    <!-- CONFIGURACIÓN DEL MÉDICO -->
+    <details class="mb-6 bg-ecopraxLight border border-blue-100 rounded-xl p-4">
+      <summary class="font-bold text-sm text-ecopraxDark cursor-pointer outline-none">⚙️ Configurar Mis Datos Profesionales (Sello y Firma)</summary>
+      <div class="mt-4 space-y-3">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nombre Completo</label>
+            <input type="text" id="med-nombre" placeholder="Dr. Fabián Semprun" class="w-full p-2.5 border rounded-lg text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nro. MPPS</label>
+            <input type="text" id="med-mpps" placeholder="MPPS: 12345" class="w-full p-2.5 border rounded-lg text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nro. Colegiado / CMV</label>
+            <input type="text" id="med-cmv" placeholder="CMV: 6789" class="w-full p-2.5 border rounded-lg text-xs bg-white">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">URL de Imagen de Firma (PNG transparente)</label>
+            <input type="text" id="med-firma-url" placeholder="https://..." class="w-full p-2.5 border rounded-lg text-xs bg-white">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">URL de Imagen de Sello (PNG)</label>
+            <input type="text" id="med-sello-url" placeholder="https://..." class="w-full p-2.5 border rounded-lg text-xs bg-white">
+          </div>
+        </div>
+        <button onclick="guardarPerfilMedico()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition shadow">Guardar Cambios de Perfil</button>
+      </div>
+    </details>
+
+    <!-- DATOS DEL PACIENTE -->
+    <section class="mb-6">
+      <h2 class="text-sm font-bold text-ecopraxDark mb-3 border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Datos del Paciente</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Nombre y Apellido</label>
+          <input type="text" id="paciente-nombre" placeholder="Ej: Juan Pérez" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Cédula / Documento</label>
+          <input type="text" id="paciente-cedula" placeholder="Ej: V-12345678" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Edad</label>
+          <input type="text" id="paciente-edad" placeholder="Ej: 40 años" class="w-full p-2.5 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
+        </div>
+      </div>
+    </section>
+
+    <!-- SELECCIÓN DE PLANTILLA -->
+    <section class="mb-6">
+      <h2 class="text-sm font-bold text-ecopraxDark mb-3 border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Tipo de Estudio Ecográfico</h2>
+      <select id="select-estudio" onchange="cargarPlantilla()" class="w-full p-3 border rounded-xl bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-ecopraxBlue">
+        <option value="abdominal">Ecografía Abdominal Superior</option>
+        <option value="renal">Ecografía Renal y Vesical</option>
+        <option value="obstetrica">Ecografía Obstétrica Básica</option>
+      </select>
+    </section>
+
+    <!-- HALLAZGOS EDITABLES -->
+    <section class="mb-6">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-sm font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Hallazgos</h2>
+        <button onclick="cargarPlantilla()" class="text-xs font-semibold text-ecopraxBlue hover:underline">Restablecer Plantilla</button>
+      </div>
+      <textarea id="hallazgos-texto" rows="8" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+    </section>
+
+    <!-- CONCLUSIÓN -->
+    <section class="mb-6">
+      <h2 class="text-sm font-bold text-ecopraxDark mb-2 border-l-4 border-ecopraxBlue pl-2 uppercase tracking-wide">Conclusión Diagnóstica</h2>
+      <textarea id="conclusion-texto" rows="3" class="w-full p-3 border rounded-xl text-xs font-mono bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue"></textarea>
+    </section>
+
+    <!-- BOTÓN DE ACCIÓN -->
+    <div class="flex justify-end pt-4 border-t">
+      <button onclick="imprimirPDF()" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm transition shadow-lg flex items-center gap-2">
+        <span>📄 Generar Informe PDF</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- CONTENEDOR OCULTO PARA IMPRESIÓN DEL PDF CON SELLOS Y FIRMAS -->
+  <div id="pdf-container" class="hidden p-8 bg-white max-w-2xl mx-auto">
+    <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
+      <div>
+        <h1 class="text-xl font-black text-ecopraxDark tracking-tight">ECO<span class="text-ecopraxBlue">PRAXIS</span></h1>
+        <p class="text-[10px] text-slate-500 uppercase">Servicio de Ecografía Clínica</p>
+      </div>
+      <div class="text-right text-xs">
+        <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
+        <p class="text-slate-500" id="pdf-medico-mpps"></p>
+        <p class="text-slate-500" id="pdf-medico-cmv"></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6">
+      <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
+      <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
+      <p><strong>Edad:</strong> <span id="pdf-edad"></span></p>
+      <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
+      <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
+    </div>
+
+    <div class="mb-6">
+      <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
+      <p id="pdf-hallazgos" class="text-xs whitespace-pre-line leading-relaxed text-slate-700 font-mono"></p>
+    </div>
+
+    <div class="mb-12">
+      <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
+      <p id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-mono"></p>
+    </div>
+
+    <!-- SELLO Y FIRMA MÉDICA -->
+    <div class="flex justify-between items-end mt-16 pt-4">
+      <div class="text-center w-40">
+        <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden" alt="Sello Médico">
+        <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
+      </div>
+      <div class="text-center w-40">
+        <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden" alt="Firma Electrónica">
+        <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const plantillas = {
+      abdominal: {
+        hallazgos: `- HÍGADO: De forma, tamaño y ecoestructura dentro de límites normales. Bordes regulares, ecogenicidad homogénea. Sin lesiones focales.
+- VESÍCULA BILIAR: Distendida, paredes finas. Luz anecoica, libre de litiasis.
+- VÍAS BILIARES: Calibre normal.
+- PÁNCREAS: Morfología conservada.
+- BAZO: Homogéneo, tamaño normal.
+- RIÑONES: Posición habitual, relación cortico-medular conservada, sin ectasia ni litiasis.`,
+        conclusion: `Ecografía Abdominal Superior dentro de parámetros normales.`
+      },
+      renal: {
+        hallazgos: `- RIÑÓN DERECHO: Dimensiones normales, parénquima de ecoesfera habitual. Sin litiasis ni hidronefrosis.
+- RIÑÓN IZQUIERDO: Sin alteraciones morfo-estructurales evidentes. Ausencia de litiasis.
+- VEJIGA URINARIA: Paredes regulares, adecuada repleción, contenido anecoico libre de ecos en suspensión.`,
+        conclusion: `Estudio ecográfico renal y vesical sin alteraciones patológicas visibles.`
+      },
+      obstetrica: {
+        hallazgos: `- GESTACIÓN: Única, intrauterina.
+- VITALIDAD: Frecuencia cardíaca fetal presente (FCF: _____ lpm).
+- BIOMETRÍA: DBP: ____ mm | LF: ____ mm | CA: ____ mm.
+- LÍQUIDO AMNIÓTICO: Normal.
+- PLACENTA: Ubicación ______, Grado de madurez __.`,
+        conclusion: `Gestación intrauterina activa de __ semanas por biometría.`
+      }
+    };
+
+    function cargarPlantilla() {
+      const tipo = document.getElementById('select-estudio').value;
+      document.getElementById('hallazgos-texto').value = plantillas[tipo].hallazgos;
+      document.getElementById('conclusion-texto').value = plantillas[tipo].conclusion;
+    }
+
+    function imprimirPDF() {
+      // Transferir datos al formato de impresión
+      document.getElementById('pdf-nombre').innerText = document.getElementById('paciente-nombre').value || 'N/A';
+      document.getElementById('pdf-cedula').innerText = document.getElementById('paciente-cedula').value || 'N/A';
+      document.getElementById('pdf-edad').innerText = document.getElementById('paciente-edad').value || 'N/A';
+      document.getElementById('pdf-fecha').innerText = new Date().toLocaleDateString('es-ES');
+      
+      const select = document.getElementById('select-estudio');
+      document.getElementById('pdf-estudio').innerText = select.options[select.selectedIndex].text;
+      document.getElementById('pdf-hallazgos').innerText = document.getElementById('hallazgos-texto').value;
+      document.getElementById('pdf-conclusion').innerText = document.getElementById('conclusion-texto').value;
+
+      // Datos del médico guardados
+      document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr. (No configurado)';
+      document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
+      document.getElementById('pdf-medico-cmv').innerText = medicoActualDatos.cmv ? `CMV: ${medicoActualDatos.cmv}` : '';
+
+      // Sello y Firma
+      const imgSello = document.getElementById('pdf-img-sello');
+      if (medicoActualDatos.selloUrl) {
+        imgSello.src = medicoActualDatos.selloUrl;
+        imgSello.classList.remove('hidden');
+      } else {
+        imgSello.classList.add('hidden');
+      }
+
+      const imgFirma = document.getElementById('pdf-img-firma');
+      if (medicoActualDatos.firmaUrl) {
+        imgFirma.src = medicoActualDatos.firmaUrl;
+        imgFirma.classList.remove('hidden');
+      } else {
+        imgFirma.classList.add('hidden');
+      }
+
+      window.print();
+    }
+
+    window.onload = cargarPlantilla;
+  </script>
+</body>
+</html>
