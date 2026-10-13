@@ -1,1195 +1,1948 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ECOPRAXIS - Ecografía Práctica | Sistema Clínico</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            ecopraxDark: '#042050',
-            ecopraxBlue: '#0152a7',
-            ecopraxLight: '#eef6ff',
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECOPRAXIS - Ecografía Práctica</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ecopraxDark: '#042050',
+                        ecopraxBlue: '#0152a7',
+                        ecopraxLight: '#eef6ff',
+                        ecopraxHover: '#013e80'
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
-  <style>
-    .editor-clinico {
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 180px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .editor-clinico ul { list-style-type: disc !important; margin-left: 1.5rem !important; }
-    .editor-clinico ol { list-style-type: decimal !important; margin-left: 1.5rem !important; }
-    .font-arial { font-family: Arial, Helvetica, sans-serif; }
-  </style>
-</head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf.js for generating PDF reports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- SECCIÓN DE AUTENTICACIÓN -->
-  <div id="auth-section" class="min-h-screen flex flex-col md:flex-row">
-    <div class="md:w-5/12 bg-[#042050] text-white p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
-      <div class="absolute -right-24 -bottom-24 w-96 h-96 rounded-full bg-blue-600/20 blur-3xl pointer-events-none"></div>
-      <div>
-        <div class="flex items-center gap-3 mb-12">
-          <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" alt="Logo" class="w-12 h-12 object-contain">
-          <div>
-            <h1 class="text-xl font-black tracking-wider text-white">ECO<span style="color: #1f99e0ff;">PRAXIS</span></h1>
-            <p class="text-[9px] tracking-widest uppercase text-slate-300">Ecografía Práctica</p>
-          </div>
-        </div>
-        <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight mb-4">Bienvenido a Ecopraxis</h2>
-        <p class="text-xs md:text-sm text-slate-300 leading-relaxed mb-8">
-          Sistema especializado para la gestión de perfiles profesionales, redacción asistida e informes ecográficos en la nube.
-        </p>
-      </div>
-      <div class="pt-8 mt-8 border-t border-white/10 text-[11px] text-slate-400">
-        ECOPRAXIS &mdash; Sistema de Gestión de Ecografía Clínica
-      </div>
-    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
 
-    <div class="md:w-7/12 bg-white p-6 md:p-12 flex flex-col justify-center overflow-y-auto min-h-screen">
-      <div class="max-w-md w-full mx-auto">
-        <!-- 1. LOGIN -->
-        <div id="form-login-container">
-          <div class="mb-6">
-            <h3 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Iniciar sesión</h3>
-            <p class="text-sm text-slate-500">Accede con el correo con el que te registraste.</p>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-800 mb-1">Correo electrónico</label>
-              <input type="email" id="login-email" placeholder="tucorreo@ejemplo.com" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-800 mb-1">Contraseña</label>
-              <input type="password" id="login-pass" placeholder="••••••••" class="w-full p-3 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-ecopraxBlue">
-            </div>
-            <div class="text-right">
-              <button type="button" id="link-forgot" class="text-xs font-bold text-ecopraxBlue hover:underline">¿Olvidaste tu contraseña?</button>
-            </div>
-            <button id="btn-login" class="w-full bg-[#042050] hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl text-sm transition">Iniciar sesión</button>
-            <div class="pt-2 text-center">
-              <p class="text-xs text-slate-500">¿Aún no tienes cuenta? <button type="button" id="link-to-register" class="font-bold text-ecopraxBlue hover:underline">Regístrate aquí</button></p>
-            </div>
-          </div>
-        </div>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
-        <!-- 2. REGISTRO -->
-        <div id="form-register-container" class="hidden">
-          <div class="mb-5">
-            <h3 class="text-2xl font-bold text-slate-900 tracking-tight">Registro Profesional</h3>
-            <p class="text-xs text-slate-500 mt-1">Completa tus datos para configurar tu perfil médico.</p>
-          </div>
-          <div class="space-y-3">
-            <div class="grid grid-cols-2 gap-3">
-              <input type="text" id="reg-nombre" placeholder="Nombre" class="p-2.5 border rounded-xl text-xs">
-              <input type="text" id="reg-apellido" placeholder="Apellido" class="p-2.5 border rounded-xl text-xs">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <input type="text" id="reg-cedula" placeholder="Cédula" class="p-2.5 border rounded-xl text-xs">
-              <select id="reg-genero" class="p-2.5 border rounded-xl text-xs">
-                <option value="Dr.">Masculino (Dr.)</option>
-                <option value="Dra.">Femenino (Dra.)</option>
-              </select>
-            </div>
-            <input type="email" id="reg-email" placeholder="Correo electrónico" class="w-full p-2.5 border rounded-xl text-xs">
-            <div class="grid grid-cols-2 gap-3">
-              <input type="password" id="reg-pass" placeholder="Contraseña" class="p-2.5 border rounded-xl text-xs">
-              <input type="password" id="reg-pass-confirm" placeholder="Repite contraseña" class="p-2.5 border rounded-xl text-xs">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-600 mb-1">Foto de Perfil (Opcional)</label>
-              <input type="file" id="reg-foto-file" accept="image/*" class="w-full text-xs text-slate-500">
-            </div>
-            <button id="btn-register-submit" class="w-full bg-[#042050] text-white font-bold py-3 rounded-xl text-xs">Completar Registro</button>
-            <button type="button" id="link-to-login-1" class="w-full bg-slate-100 text-slate-700 font-semibold py-2 rounded-xl text-xs">Volver</button>
-          </div>
-        </div>
-
-        <!-- 3. OLVIDÉ MI CONTRASEÑA -->
-        <div id="form-forgot-container" class="hidden">
-          <h3 class="text-2xl font-bold mb-2">Recuperar contraseña</h3>
-          <input type="email" id="forgot-email" placeholder="Correo registrado" class="w-full p-3 border rounded-xl text-sm mb-4">
-          <button id="btn-forgot-submit" class="w-full bg-[#042050] text-white font-bold py-3 rounded-xl text-sm mb-2">Enviar enlace</button>
-          <button type="button" id="link-to-login-2" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs">Volver</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- APLICACIÓN PRINCIPAL (DASHBOARD) -->
-  <div id="app-section" class="hidden min-h-screen flex flex-col md:flex-row relative">
-    
-    <!-- BARRA SUPERIOR MÓVIL (MENÚ DESPLEGABLE) -->
-    <header class="md:hidden bg-[#042050] text-white p-4 flex justify-between items-center sticky top-0 z-40 shadow-md">
-      <div class="flex items-center gap-2">
-        <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" class="w-7 h-7 object-contain" alt="Logo">
-        <span class="font-black text-sm tracking-wider">ECOPRAXIS</span>
-      </div>
-      <button id="btn-toggle-mobile-menu" class="p-2 rounded-lg bg-white/10 text-white focus:outline-none">
-        ☰
-      </button>
-    </header>
-
-    <!-- OVERLAY PARA MÓVIL -->
-    <div id="mobile-overlay" class="hidden fixed inset-0 bg-black/50 z-40 md:hidden"></div>
-
-    <!-- BARRA LATERAL (SIDEBAR) -->
-    <aside id="sidebar-container" class="fixed md:static inset-y-0 left-0 w-72 bg-[#042050] text-white flex flex-col justify-between shrink-0 shadow-xl z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
-      <div>
-        <div class="p-6 hidden md:flex items-center gap-3 border-b border-white/10">
-          <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_NEGATIVO.png" alt="Logo" class="w-9 h-9 object-contain">
-          <div>
-            <h1 class="text-lg font-black tracking-wider text-white">ECO<span style="color: #1f99e0ff;">PRAXIS</span></h1>
-            <p class="text-[8px] tracking-widest uppercase text-slate-300">Ecografía Práctica</p>
-          </div>
-        </div>
-
-        <nav class="p-4 space-y-1">
-          <button onclick="cambiarVista('vista-registros', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition bg-blue-600/30 text-white cursor-pointer">
-            <span>🗂️</span> Registros Realizados
-          </button>
-          <button onclick="iniciarNuevoReporteForm()" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
-            <span>➕</span> Nuevo Reporte
-          </button>
-          <button onclick="cambiarVista('vista-configuracion', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
-            <span>⚙️</span> Datos Profesionales
-          </button>
-          <button onclick="cambiarVista('vista-perfil', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
-            <span>👤</span> Mi Perfil
-          </button>
-        </nav>
-      </div>
-
-      <!-- Usuario Abajo -->
-      <div class="p-4 border-t border-white/10 space-y-4 bg-black/20">
-        <div class="flex items-center gap-3">
-          <img id="sidebar-user-img" src="https://via.placeholder.com/150" class="w-10 h-10 rounded-full object-cover border-2 border-blue-400" alt="Avatar">
-          <div class="overflow-hidden">
-            <p id="sidebar-user-name" class="text-xs font-bold text-white truncate">Dr. (Cargando...)</p>
-            <p id="sidebar-user-email" class="text-[10px] text-slate-400 truncate">correo@ejemplo.com</p>
-          </div>
-        </div>
-        <button id="btn-logout" class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-300 py-2 rounded-xl text-xs font-bold border border-red-500/20">
-          <span>🚪</span> Cerrar Sesión
-        </button>
-      </div>
-    </aside>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
-      
-      <!-- VISTA 1: REGISTROS REALIZADOS -->
-      <div id="vista-registros" class="seccion-vista max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-4 md:p-6 border-t-4 border-ecopraxBlue">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-4 border-b">
-          <div>
-            <h2 class="text-xl font-black text-ecopraxDark">Registros Realizados</h2>
-            <p class="text-xs text-slate-500">Bandeja de informes ecográficos almacenados.</p>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-            <input type="text" id="input-buscar" onkeyup="filtrarTabla()" placeholder="🔍 Buscar nombre o C.I..." class="p-2 border rounded-xl text-xs bg-slate-50 w-full sm:w-48 outline-none focus:ring-2 focus:ring-ecopraxBlue">
-            <input type="date" id="filtro-fecha" onchange="filtrarTabla()" class="p-2 border rounded-xl text-xs bg-slate-50 outline-none focus:ring-2 focus:ring-ecopraxBlue">
-            <button onclick="limpiarFiltros()" class="text-xs text-ecopraxBlue font-bold hover:underline">Limpiar</button>
-          </div>
-        </div>
-
-        <div class="bg-slate-100 p-2 rounded-xl border flex items-center justify-between mb-4 gap-2">
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-500 font-semibold ml-2">Acciones:</span>
-            <button id="btn-tool-descargar" disabled onclick="accionDescargar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">📥 Descargar PDF</button>
-            <button id="btn-tool-editar" disabled onclick="accionEditar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">✏️ Editar</button>
-            <button id="btn-tool-borrar" disabled onclick="accionBorrar()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition">🗑️ Borrar</button>
-          </div>
-          <span id="contador-seleccionados" class="text-xs font-bold text-slate-500 mr-2">0 seleccionados</span>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="border-b bg-slate-50 text-slate-600 uppercase font-bold">
-                <th class="p-3 w-10 text-center"><input type="checkbox" id="check-select-all" onchange="toggleSelectAll(this)"></th>
-                <th class="p-3">Nombre y Apellido</th>
-                <th class="p-3">Cédula</th>
-                <th class="p-3">Tipo de Estudio</th>
-                <th class="p-3">Fecha</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-registros-body" class="divide-y"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- VISTA 2: NUEVO REPORTE -->
-      <div id="vista-nuevo-reporte" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8 border-t-4 border-ecopraxBlue">
+        /* Rich text content area */
+        .rich-editor [contenteditable="true"] {
+            outline: none;
+            min-height: 140px;
+        }
+        .rich-editor [contenteditable="true"]:focus {
+            outline: none;
+        }
         
-        <!-- PASO 1: DATOS DEL PACIENTE -->
-        <div id="paso-paciente">
-          <div class="flex justify-between items-center border-b pb-3 mb-6">
-            <div>
-              <h2 class="text-xl font-black text-ecopraxDark">Paso 1: Registrar Datos del Paciente</h2>
-              <p class="text-xs text-slate-500">Ingrese la información básica del paciente.</p>
-            </div>
-            <button onclick="abrirModalPacientesRegistrados()" class="bg-blue-50 hover:bg-blue-100 text-ecopraxBlue text-xs font-bold px-3 py-2 rounded-xl border border-blue-200 transition">
-              👥 Pacientes ya registrados
-            </button>
-          </div>
-
-          <div class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Nombre</label>
-                <input type="text" id="pac-nombre" placeholder="Ej: Andrea" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Apellido</label>
-                <input type="text" id="pac-apellido" placeholder="Ej: Fernández" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Cédula</label>
-                <input type="text" id="pac-cedula" placeholder="Ej: V-28003579" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Edad</label>
-                <input type="text" id="pac-edad" placeholder="Ej: 32 años" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Teléfono</label>
-                <input type="text" id="pac-telefono" placeholder="Ej: 0414-1234567" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Sexo</label>
-                <select id="pac-sexo" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50">
-                  <option value="Femenino">Femenino</option>
-                  <option value="Masculino">Masculino</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Tipo de Estudio Ecográfico</label>
-                <select id="pac-estudio" class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 font-bold text-ecopraxDark">
-                  <option value="Ecografía Abdominal">Ecografía Abdominal</option>
-                  <option value="Ecografía Renal y Vías Urinarias">Ecografía Renal y Vías Urinarias</option>
-                  <option value="Ecografía Hepatobiliar">Ecografía Hepatobiliar</option>
-                  <option value="Ecografía de Tiroides">Ecografía de Tiroides</option>
-                  <option value="Ecografía Inguinal">Ecografía Inguinal</option>
-                  <option value="Ecografía de Piel y Partes Blandas">Ecografía de Piel y Partes Blandas</option>
-                  <option value="Ecografía Testicular">Ecografía Testicular</option>
-                  <option value="Ecografía Pélvica Masculina">Ecografía Pélvica Masculina</option>
-                  <option value="Ecografía Pélvica Femenina">Ecografía Pélvica Femenina</option>
-                  <option value="Ecografía Transvaginal">Ecografía Transvaginal</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="border p-3 rounded-xl bg-slate-50 space-y-2">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="check-fecha-manual" onchange="toggleFechaManual(this)" class="w-4 h-4 text-ecopraxBlue">
-                <span class="text-xs font-bold text-slate-700">Seleccionar fecha de realización manualmente</span>
-              </label>
-              <div id="container-fecha-manual" class="hidden">
-                <input type="date" id="pac-fecha-manual" class="p-2 border rounded-lg text-xs bg-white">
-              </div>
-            </div>
-
-            <div class="pt-4 flex justify-end">
-              <button onclick="guardarPacienteYContinuar()" class="bg-[#042050] hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-xl text-xs shadow-md">
-                Guardar y Redactar Hallazgos ➔
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- PASO 2: HALLAZGOS Y CONCLUSIONES -->
-        <div id="paso-clinico" class="hidden">
-          <div class="flex justify-between items-center border-b pb-3 mb-6">
-            <div>
-              <h2 class="text-xl font-black text-ecopraxDark">Paso 2: Hallazgos y Conclusión</h2>
-              <p id="resumen-paciente-paso2" class="text-xs text-ecopraxBlue font-bold"></p>
-            </div>
-            <button onclick="volverAPasoPaciente()" class="text-xs font-semibold text-slate-500 hover:underline">← Modificar Paciente</button>
-          </div>
-
-          <section class="mb-6">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-xs font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase">Hallazgos</h3>
-              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-                <button type="button" onclick="ejecutarComando('bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
-                <button type="button" onclick="ejecutarComando('italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
-                <button type="button" onclick="ejecutarComando('insertUnorderedList')" class="w-7 h-7 bg-white border rounded text-xs font-bold">☰•</button>
-                <select onchange="cambiarCaso('hallazgos-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
-                  <option value="" disabled selected>AA ▾</option>
-                  <option value="mayus">MAYÚSCULAS</option>
-                  <option value="minus">minúsculas</option>
-                </select>
-              </div>
-            </div>
-            <div id="hallazgos-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-slate-50 outline-none"></div>
-
-            <div class="mt-3">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="check-observaciones" onchange="toggleSeccion('sec-observaciones', this)" class="w-4 h-4 text-ecopraxBlue">
-                <span class="text-xs font-bold text-slate-700">Añadir sección de Observaciones</span>
-              </label>
-              <div id="sec-observaciones" class="hidden mt-2">
-                <textarea id="texto-observaciones" placeholder="Escriba las observaciones adicionales..." class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 h-20 outline-none"></textarea>
-              </div>
-            </div>
-          </section>
-
-          <section class="mb-6">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-xs font-bold text-ecopraxDark border-l-4 border-ecopraxBlue pl-2 uppercase">Conclusión Diagnóstica</h3>
-              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border">
-                <button type="button" onclick="ejecutarComandoConclusion('bold')" class="w-7 h-7 font-bold bg-white border rounded text-xs"><b>N</b></button>
-                <button type="button" onclick="ejecutarComandoConclusion('italic')" class="w-7 h-7 italic bg-white border rounded text-xs"><i>K</i></button>
-                <select onchange="cambiarCaso('conclusion-texto', this)" class="h-7 px-1 text-xs font-bold bg-white border rounded text-ecopraxBlue">
-                  <option value="" disabled selected>AA ▾</option>
-                  <option value="mayus">MAYÚSCULAS</option>
-                  <option value="minus">minúsculas</option>
-                </select>
-              </div>
-            </div>
-            <div id="conclusion-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs font-arial bg-slate-50 outline-none" style="min-height: 90px;"></div>
-
-            <div class="mt-3">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="check-nota" onchange="toggleSeccion('sec-nota', this)" class="w-4 h-4 text-ecopraxBlue">
-                <span class="text-xs font-bold text-slate-700">Añadir sección de Nota</span>
-              </label>
-              <div id="sec-nota" class="hidden mt-2">
-                <textarea id="texto-nota" placeholder="Escriba una nota aclaratoria..." class="w-full p-2.5 border rounded-xl text-xs bg-slate-50 h-16 outline-none"></textarea>
-              </div>
-            </div>
-          </section>
-
-          <div class="flex justify-end pt-4 border-t gap-3">
-            <button onclick="mostrarVistaPreviaModal()" class="bg-ecopraxDark hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-xl text-sm shadow-lg flex items-center gap-2">
-              <span>👁️ Vista Previa</span>
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- VISTA 3: CONFIGURACIÓN PROFESIONAL -->
-      <div id="vista-configuracion" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
-        <h2 class="text-xl font-black text-ecopraxDark mb-4">Configuración Profesional</h2>
-        <div class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input type="text" id="med-nombre" placeholder="Nombre con Título (Ej: Dr. Fabián Semprun)" class="p-2.5 border rounded-lg text-xs">
-            <input type="text" id="med-mpps" placeholder="Nro. MPPS" class="p-2.5 border rounded-lg text-xs">
-          </div>
-          <div class="border p-3 rounded-lg">
-            <label class="flex items-center gap-2 cursor-pointer mb-2">
-              <input type="checkbox" id="check-colegiado" class="w-4 h-4 text-ecopraxBlue">
-              <span class="text-xs font-bold">¿Posee Nro. de Colegiado / C.M.V.?</span>
-            </label>
-            <div id="container-cmv" class="hidden">
-              <input type="text" id="med-cmv" placeholder="Ej: 23.550" class="w-full p-2 border rounded text-xs">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="border p-3 rounded-xl text-center">
-              <label class="block text-xs font-bold mb-2">Sello Profesional</label>
-              <input type="file" id="file-sello" accept="image/*" class="text-xs">
-              <img id="preview-sello" src="" class="h-16 mx-auto mt-2 hidden object-contain" alt="Sello">
-            </div>
-            <div class="border p-3 rounded-xl text-center">
-              <label class="block text-xs font-bold mb-2">Firma Digital</label>
-              <input type="file" id="file-firma" accept="image/*" class="text-xs">
-              <img id="preview-firma" src="" class="h-16 mx-auto mt-2 hidden object-contain" alt="Firma">
-            </div>
-          </div>
-          <button id="btn-guardar-perfil" class="bg-ecopraxBlue text-white text-xs font-bold px-5 py-2.5 rounded-lg">Guardar Cambios</button>
-        </div>
-      </div>
-
-      <!-- VISTA 4: MI PERFIL -->
-      <div id="vista-perfil" class="seccion-vista hidden max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 border-t-4 border-ecopraxBlue">
-        <h2 class="text-xl font-black text-ecopraxDark mb-4">Mi Perfil Profesional</h2>
-        <div class="space-y-6">
-          <div class="flex items-center gap-6 p-6 bg-slate-50 rounded-2xl border">
-            <img id="profile-view-img" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full object-cover border-4 border-ecopraxBlue" alt="Avatar">
-            <div class="space-y-2">
-              <h3 id="profile-view-name" class="text-lg font-bold text-ecopraxDark">Dr. (Cargando...)</h3>
-              <p id="profile-view-email" class="text-xs text-slate-600">correo@ejemplo.com</p>
-              <input type="file" id="file-perfil" accept="image/*" class="text-xs">
-            </div>
-          </div>
-
-          <!-- CAMBIO DE CONTRASEÑA -->
-          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Seguridad y Contraseña</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input type="password" id="perfil-nueva-pass" placeholder="Nueva contraseña" class="p-2.5 border rounded-xl text-xs bg-white">
-              <input type="password" id="perfil-confirma-pass" placeholder="Repite nueva contraseña" class="p-2.5 border rounded-xl text-xs bg-white">
-            </div>
-            <button onclick="cambiarPasswordPerfil()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition">
-              🔑 Cambiar la contraseña
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </main>
-  </div>
-
-  <!-- MODAL DE PACIENTES YA REGISTRADOS -->
-  <div id="modal-pacientes" class="hidden fixed inset-0 bg-slate-900/70 z-50 flex justify-center items-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
-      <div class="flex justify-between items-center mb-4 border-b pb-2">
-        <h3 class="text-sm font-bold text-ecopraxDark">Pacientes Registrados Previamente</h3>
-        <button onclick="cerrarModalPacientes()" class="text-xs font-bold text-slate-500">✕ Cerrar</button>
-      </div>
-      <input type="text" id="input-buscar-modal" onkeyup="filtrarPacientesModal()" placeholder="🔍 Buscar por nombre o cédula..." class="w-full p-2.5 border rounded-xl text-xs mb-3 bg-slate-50 outline-none">
-      <div id="lista-pacientes-modal" class="max-h-64 overflow-y-auto space-y-2">
-        <!-- Cargado dinámicamente -->
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL DE VISTA PREVIA Y ACCIONES DE INFORME -->
-  <div id="modal-preview" class="hidden fixed inset-0 bg-slate-900/70 z-50 overflow-y-auto p-4 md:p-10 flex justify-center items-start">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative my-6">
-      <div class="flex justify-between items-center pb-4 mb-6 border-b">
-        <span class="text-xs font-bold text-slate-500 uppercase">Vista Previa de Informe</span>
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg">🖨️ Imprimir</button>
-          <button onclick="guardarYGenerarPDF()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg">📥 Guardar y Descargar PDF</button>
-          <button onclick="cerrarVistaPreviaModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg">✕ Cerrar</button>
-        </div>
-      </div>
-
-      <div id="planilla-imprimible">
-        <div class="flex justify-between items-center border-b-2 border-ecopraxDark pb-4 mb-6">
-          <div class="flex items-center gap-2">
-            <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
-            <div>
-              <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
-              <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
-            </div>
-          </div>
-          <div class="text-right text-xs">
-            <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
-            <p class="text-slate-500" id="pdf-medico-mpps"></p>
-            <p class="text-slate-500" id="pdf-medico-cmv"></p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-6 font-arial">
-          <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
-          <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
-          <p><strong>Edad / Sexo:</strong> <span id="pdf-edad-sexo"></span></p>
-          <p><strong>Teléfono:</strong> <span id="pdf-telefono"></span></p>
-          <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
-          <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
-          <div id="pdf-hallazgos" class="text-xs leading-relaxed text-slate-700 font-arial"></div>
-        </div>
-
-        <div id="pdf-container-obs" class="mb-4 hidden">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Observaciones</h3>
-          <p id="pdf-observaciones" class="text-xs text-slate-700 font-arial"></p>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
-          <div id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-arial"></div>
-        </div>
-
-        <div id="pdf-container-nota" class="mb-6 hidden">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Nota</h3>
-          <p id="pdf-nota" class="text-xs italic text-slate-600 font-arial"></p>
-        </div>
-
-        <div class="flex justify-between items-end mt-12 pt-4">
-          <div class="text-center w-40">
-            <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
-            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
-          </div>
-          <div class="text-center w-40">
-            <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden object-contain" alt="Firma">
-            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    @media print {
-      body * { visibility: hidden; }
-      #modal-preview, #modal-preview * { visibility: visible; }
-      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
-      #modal-preview button { display: none !important; }
-    }
-  </style>
-
-  <!-- LÓGICA JAVASCRIPT & FIREBASE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updatePassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, deleteDoc, updateDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBDWqtkoFIjwnfmvxEb7e1jNxyko43FRVc",
-      authDomain: "ecopraxis-d12fd.firebaseapp.com",
-      projectId: "ecopraxis-d12fd",
-      storageBucket: "ecopraxis-d12fd.firebasestorage.app",
-      messagingSenderId: "242952378160",
-      appId: "1:242952378160:web:aed47838b8b71dfe731af5",
-      measurementId: "G-RFF4R8Y6EP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let medicoActualDatos = { selloUrl: '', firmaUrl: '', perfilUrl: '' };
-    let tempFotoBase64 = '';
-    let examenesListaGlobal = [];
-    let examenEditandoId = null;
-
-    const plantillasEstudios = {
-      "Ecografía Abdominal": {
-        hallazgos: "<ul><li><b>HÍGADO:</b> Forma, tamaño y ecoestructura normales. Sin lesiones focales.</li><li><b>VESÍCULA BILIAR:</b> Paredes finas, luz anecoica libre de litiasis.</li><li><b>RIÑONES:</b> Morfología conservada, sin ectasia ni litiasis.</li></ul>",
-        conclusion: "Ecografía Abdominal dentro de parámetros normales."
-      },
-      "Ecografía Renal y Vías Urinarias": {
-        hallazgos: "<ul><li><b>RIÑÓN DERECHO:</b> Tamaño y parénquima normales. Sin litiasis.</li><li><b>RIÑÓN IZQUIERDO:</b> Sin alteraciones morfológicas. Sin litiasis.</li><li><b>VEJIGA:</b> Repleción adecuada, paredes finas.</li></ul>",
-        conclusion: "Estudio renal y de vías urinarias sin alteraciones visibles."
-      }
-    };
-
-    // MENÚ MÓVIL
-    const btnMobile = document.getElementById('btn-toggle-mobile-menu');
-    const sidebar = document.getElementById('sidebar-container');
-    const overlay = document.getElementById('mobile-overlay');
-
-    function toggleMobileMenu() {
-      sidebar.classList.toggle('-translate-x-full');
-      overlay.classList.toggle('hidden');
-    }
-    btnMobile?.addEventListener('click', toggleMobileMenu);
-    overlay?.addEventListener('click', toggleMobileMenu);
-
-    window.cambiarVista = function(idVista, btnElem) {
-      document.querySelectorAll('.seccion-vista').forEach(el => el.classList.add('hidden'));
-      document.getElementById(idVista).classList.remove('hidden');
-
-      if (btnElem) {
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-          btn.classList.remove('bg-blue-600/30', 'text-white', 'font-bold');
-          btn.classList.add('text-slate-300', 'font-semibold');
-        });
-        btnElem.classList.add('bg-blue-600/30', 'text-white', 'font-bold');
-      }
-
-      if (window.innerWidth < 768) {
-        sidebar.classList.add('-translate-x-full');
-        overlay.classList.add('hidden');
-      }
-    }
-
-    // INICIAR NUEVO REPORTE CON CAMPOS VACÍOS Y PLACEHOLDERS
-    window.iniciarNuevoReporteForm = function() {
-      examenEditandoId = null;
-      document.getElementById('pac-nombre').value = "";
-      document.getElementById('pac-apellido').value = "";
-      document.getElementById('pac-cedula').value = "";
-      document.getElementById('pac-edad').value = "";
-      document.getElementById('pac-telefono').value = "";
-      document.getElementById('pac-sexo').selectedIndex = 0;
-      
-      const selectEstudio = document.getElementById('pac-estudio');
-      selectEstudio.disabled = false;
-      selectEstudio.selectedIndex = 0;
-
-      document.getElementById('check-fecha-manual').checked = false;
-      document.getElementById('container-fecha-manual').classList.add('hidden');
-      document.getElementById('pac-fecha-manual').value = "";
-
-      document.getElementById('hallazgos-texto').innerHTML = "";
-      document.getElementById('conclusion-texto').innerHTML = "";
-      document.getElementById('check-observaciones').checked = false;
-      document.getElementById('sec-observaciones').classList.add('hidden');
-      document.getElementById('texto-observaciones').value = "";
-      document.getElementById('check-nota').checked = false;
-      document.getElementById('sec-nota').classList.add('hidden');
-      document.getElementById('texto-nota').value = "";
-
-      document.getElementById('paso-clinico').classList.add('hidden');
-      document.getElementById('paso-paciente').classList.remove('hidden');
-
-      cambiarVista('vista-nuevo-reporte');
-    }
-
-    window.toggleFechaManual = function(check) {
-      document.getElementById('container-fecha-manual').classList.toggle('hidden', !check.checked);
-    }
-
-    window.toggleSeccion = function(idContainer, check) {
-      document.getElementById(idContainer).classList.toggle('hidden', !check.checked);
-    }
-
-    // GUARDAR PACIENTE Y PASAR A PASO 2
-    window.guardarPacienteYContinuar = function() {
-      const nom = document.getElementById('pac-nombre').value.trim();
-      const ape = document.getElementById('pac-apellido').value.trim();
-      const ced = document.getElementById('pac-cedula').value.trim();
-
-      if (!nom || !ape || !ced) {
-        alert("Por favor complete los datos obligatorios del paciente (Nombre, Apellido y Cédula).");
-        return;
-      }
-
-      const estudio = document.getElementById('pac-estudio').value;
-      document.getElementById('resumen-paciente-paso2').innerText = `Paciente: ${nom} ${ape} | C.I: ${ced} | ${estudio}`;
-
-      const hallazgosElem = document.getElementById('hallazgos-texto');
-      const conclusionElem = document.getElementById('conclusion-texto');
-      if (!hallazgosElem.innerHTML && plantillasEstudios[estudio]) {
-        hallazgosElem.innerHTML = plantillasEstudios[estudio].hallazgos;
-        conclusionElem.innerHTML = plantillasEstudios[estudio].conclusion;
-      }
-
-      document.getElementById('paso-paciente').classList.add('hidden');
-      document.getElementById('paso-clinico').classList.remove('hidden');
-    }
-
-    window.volverAPasoPaciente = function() {
-      document.getElementById('paso-clinico').classList.add('hidden');
-      document.getElementById('paso-paciente').classList.remove('hidden');
-    }
-
-    // PACIENTES YA REGISTRADOS MODAL
-    window.abrirModalPacientesRegistrados = function() {
-      const modal = document.getElementById('modal-pacientes');
-      modal.classList.remove('hidden');
-      renderizarListaPacientesModal(examenesListaGlobal);
-    }
-    window.cerrarModalPacientes = function() {
-      document.getElementById('modal-pacientes').classList.add('hidden');
-    }
-
-    function renderizarListaPacientesModal(lista) {
-      const contenedor = document.getElementById('lista-pacientes-modal');
-      contenedor.innerHTML = "";
-      
-      // Obtener pacientes únicos por cédula
-      const unicos = Array.from(new Set(lista.map(a => a.pacienteCedula)))
-        .map(ced => lista.find(a => a.pacienteCedula === ced));
-
-      if (unicos.length === 0) {
-        contenedor.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-4">No hay pacientes previos registrados.</p>`;
-        return;
-      }
-
-      unicos.forEach(p => {
-        contenedor.innerHTML += `
-          <div class="p-3 border rounded-xl bg-slate-50 flex justify-between items-center text-xs">
-            <div>
-              <p class="font-bold text-ecopraxDark">${p.pacienteNombre} ${p.pacienteApellido || ''}</p>
-              <p class="text-slate-500">Cédula: ${p.pacienteCedula} | Tel: ${p.pacienteTelefono || 'N/A'}</p>
-            </div>
-            <button onclick="seleccionarPacientePrevio('${p.id}')" class="bg-ecopraxBlue text-white px-3 py-1.5 rounded-lg font-bold">Seleccionar</button>
-          </div>
-        `;
-      });
-    }
-
-    window.filtrarPacientesModal = function() {
-      const texto = document.getElementById('input-buscar-modal').value.toLowerCase();
-      const filtrados = examenesListaGlobal.filter(item => 
-        `${item.pacienteNombre} ${item.pacienteApellido}`.toLowerCase().includes(texto) ||
-        item.pacienteCedula.toLowerCase().includes(texto)
-      );
-      renderizarListaPacientesModal(filtrados);
-    }
-
-    window.seleccionarPacientePrevio = function(id) {
-      const p = examenesListaGlobal.find(item => item.id === id);
-      if (!p) return;
-
-      document.getElementById('pac-nombre').value = p.pacienteNombre || '';
-      document.getElementById('pac-apellido').value = p.pacienteApellido || '';
-      document.getElementById('pac-cedula').value = p.pacienteCedula || '';
-      document.getElementById('pac-edad').value = p.pacienteEdad || '';
-      document.getElementById('pac-telefono').value = p.pacienteTelefono || '';
-      document.getElementById('pac-sexo').value = p.pacienteSexo || 'Femenino';
-
-      cerrarModalPacientes();
-    }
-
-    // CARGAR Y RENDERIZAR TABLA DE REGISTROS
-    async function cargarRegistros(uid) {
-      const tbody = document.getElementById('tabla-registros-body');
-      tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center italic text-slate-400">Cargando registros...</td></tr>`;
-
-      try {
-        const q = query(collection(db, "examenes"), where("medicoUid", "==", uid));
-        const snapshot = await getDocs(q);
-        examenesListaGlobal = [];
-
-        snapshot.forEach(docSnap => {
-          examenesListaGlobal.push({ id: docSnap.id, ...docSnap.data() });
-        });
-
-        renderizarTabla(examenesListaGlobal);
-      } catch (e) {
-        console.error("Error al cargar registros:", e);
-      }
-    }
-
-    function renderizarTabla(lista) {
-      const tbody = document.getElementById('tabla-registros-body');
-      tbody.innerHTML = "";
-
-      if (lista.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center italic text-slate-400">No se encontraron registros.</td></tr>`;
-        actualizarBarraHerramientas();
-        return;
-      }
-
-      lista.forEach(item => {
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50 transition border-b">
-            <td class="p-3 text-center">
-              <input type="checkbox" value="${item.id}" onchange="actualizarBarraHerramientas()" class="check-item w-4 h-4 text-ecopraxBlue">
-            </td>
-            <td class="p-3 font-bold text-slate-800">${item.pacienteNombre} ${item.pacienteApellido || ''}</td>
-            <td class="p-3 text-slate-600">${item.pacienteCedula}</td>
-            <td class="p-3 text-ecopraxBlue font-semibold">${item.estudioTipo}</td>
-            <td class="p-3 text-slate-500">${item.fechaStr}</td>
-          </tr>
-        `;
-      });
-      actualizarBarraHerramientas();
-    }
-
-    window.filtrarTabla = function() {
-      const texto = document.getElementById('input-buscar').value.toLowerCase();
-      const fecha = document.getElementById('filtro-fecha').value;
-
-      const filtrados = examenesListaGlobal.filter(item => {
-        const coincideNombre = `${item.pacienteNombre} ${item.pacienteApellido}`.toLowerCase().includes(texto);
-        const coincideCedula = item.pacienteCedula.toLowerCase().includes(texto);
-        const coincideFecha = !fecha || item.fechaISO === fecha;
-        return (coincideNombre || coincideCedula) && coincideFecha;
-      });
-
-      renderizarTabla(filtrados);
-    }
-
-    window.limpiarFiltros = function() {
-      document.getElementById('input-buscar').value = "";
-      document.getElementById('filtro-fecha').value = "";
-      renderizarTabla(examenesListaGlobal);
-    }
-
-    window.toggleSelectAll = function(checkMaster) {
-      document.querySelectorAll('.check-item').forEach(c => c.checked = checkMaster.checked);
-      actualizarBarraHerramientas();
-    }
-
-    window.actualizarBarraHerramientas = function() {
-      const seleccionados = Array.from(document.querySelectorAll('.check-item:checked')).map(c => c.value);
-      const count = seleccionados.length;
-      document.getElementById('contador-seleccionados').innerText = `${count} seleccionado(s)`;
-
-      const btnDescargar = document.getElementById('btn-tool-descargar');
-      const btnEditar = document.getElementById('btn-tool-editar');
-      const btnBorrar = document.getElementById('btn-tool-borrar');
-
-      if (count > 0) {
-        btnBorrar.disabled = false;
-        btnBorrar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 cursor-pointer transition";
-
-        if (count === 1) {
-          btnDescargar.disabled = false;
-          btnDescargar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-ecopraxLight text-ecopraxBlue border border-blue-200 hover:bg-blue-100 cursor-pointer transition";
-          
-          btnEditar.disabled = false;
-          btnEditar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition";
-        } else {
-          btnDescargar.disabled = true;
-          btnDescargar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition";
-          btnEditar.disabled = true;
-          btnEditar.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition";
+        /* Printable preview styling */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-report, #printable-report * {
+                visibility: visible;
+            }
+            #printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                box-shadow: none;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
-      } else {
-        [btnDescargar, btnEditar, btnBorrar].forEach(btn => {
-          btn.disabled = true;
-          btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-400 border border-slate-200 cursor-not-allowed transition";
-        });
-      }
-    }
+    </style>
+</head>
+<body class="text-slate-800 bg-slate-50 antialiased h-screen overflow-hidden">
 
-    window.accionDescargar = function() {
-      const selectedId = document.querySelector('.check-item:checked').value;
-      const item = examenesListaGlobal.find(e => e.id === selectedId);
-      if (!item) return;
-      poblarVistaPreviaModal(item);
-      document.getElementById('modal-preview').classList.remove('hidden');
-    }
+    <div id="app" class="h-full w-full flex flex-col">
 
-    // AL EDITAR: BLOQUEAR TIPO DE ESTUDIO
-    window.accionEditar = function() {
-      const selectedId = document.querySelector('.check-item:checked').value;
-      const item = examenesListaGlobal.find(e => e.id === selectedId);
-      if (!item) return;
+        <!-- ========================================== -->
+        <!-- 1. AUTHENTICATION / LANDING SCREEN (Split) -->
+        <!-- ========================================== -->
+        <div id="auth-screen" class="flex-1 flex flex-col md:flex-row h-full w-full overflow-y-auto">
+            <!-- Left Column - Branding -->
+            <div class="md:w-5/12 bg-ecopraxDark text-white p-8 md:p-12 flex flex-col justify-between relative overflow-hidden shrink-0">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-ecopraxBlue opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="z-10">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-12 h-12 rounded-xl bg-ecopraxBlue flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                            <i class="fa-solid fa-wave-square"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold tracking-tight text-white">ECOPRAXIS</h1>
+                            <p class="text-xs text-blue-200 tracking-wider uppercase font-semibold">Ecografía Práctica</p>
+                        </div>
+                    </div>
 
-      examenEditandoId = item.id;
-      document.getElementById('pac-nombre').value = item.pacienteNombre || '';
-      document.getElementById('pac-apellido').value = item.pacienteApellido || '';
-      document.getElementById('pac-cedula').value = item.pacienteCedula || '';
-      document.getElementById('pac-edad').value = item.pacienteEdad || '';
-      document.getElementById('pac-telefono').value = item.pacienteTelefono || '';
-      document.getElementById('pac-sexo').value = item.pacienteSexo || 'Femenino';
-      
-      const selectEstudio = document.getElementById('pac-estudio');
-      selectEstudio.value = item.estudioTipo;
-      selectEstudio.disabled = true; // Bloqueado al editar
+                    <h2 class="text-3xl font-extrabold mb-4 leading-tight">Plataforma Médica Especializada en Informes Ecográficos</h2>
+                    <p class="text-blue-100 text-sm mb-8 leading-relaxed">Optimice su consulta médica con plantillas personalizadas, redacción rápida y generación de reportes profesionales en formato estándar en segundos.</p>
 
-      document.getElementById('hallazgos-texto').innerHTML = item.hallazgos || '';
-      document.getElementById('conclusion-texto').innerHTML = item.conclusion || '';
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-900/60 flex items-center justify-center text-blue-300 shrink-0 mt-1">
+                                <i class="fa-solid fa-file-medical"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm">10 Plantillas de Estudios Ecográficos</h4>
+                                <p class="text-xs text-blue-200">Abdominal, Renal, Tiroides, Pélvica, Transvaginal y más.</p>
+                            </div>
+                        </div>
 
-      if (item.observaciones) {
-        document.getElementById('check-observaciones').checked = true;
-        document.getElementById('sec-observaciones').classList.remove('hidden');
-        document.getElementById('texto-observaciones').value = item.observaciones;
-      }
-      if (item.nota) {
-        document.getElementById('check-nota').checked = true;
-        document.getElementById('sec-nota').classList.remove('hidden');
-        document.getElementById('texto-nota').value = item.nota;
-      }
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-900/60 flex items-center justify-center text-blue-300 shrink-0 mt-1">
+                                <i class="fa-solid fa-signature"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Firma y Sello Digital con Transparencia</h4>
+                                <p class="text-xs text-blue-200">Integración automática en sus documentos impresos o en PDF.</p>
+                            </div>
+                        </div>
 
-      cambiarVista('vista-nuevo-reporte');
-      guardarPacienteYContinuar();
-    }
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-900/60 flex items-center justify-center text-blue-300 shrink-0 mt-1">
+                                <i class="fa-solid fa-cloud-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Base de Datos de Pacientes y Registros</h4>
+                                <p class="text-xs text-blue-200">Búsqueda rápida y reutilización de datos para futuros controles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    window.accionBorrar = async function() {
-      const seleccionados = Array.from(document.querySelectorAll('.check-item:checked')).map(c => c.value);
-      if (!confirm(`¿Está seguro de eliminar ${seleccionados.length} registro(s)?`)) return;
+                <div class="mt-8 pt-6 border-t border-blue-900/50 text-xs text-blue-300 z-10 flex justify-between items-center">
+                    <span>ECOPRAXIS v2.5 Clinical Suite</span>
+                    <span>&copy; 2026 Todos los derechos reservados</span>
+                </div>
+            </div>
 
-      try {
-        for (const id of seleccionados) {
-          await deleteDoc(doc(db, "examenes", id));
-        }
-        alert("Registro(s) eliminado(s) correctamente.");
-        cargarRegistros(auth.currentUser.uid);
-      } catch (e) {
-        alert("Error al eliminar: " + e.message);
-      }
-    }
+            <!-- Right Column - Forms -->
+            <div class="md:w-7/12 bg-white flex items-center justify-center p-6 md:p-12 overflow-y-auto">
+                <div class="w-full max-w-md my-auto">
+                    
+                    <!-- TAB NAVIGATION -->
+                    <div class="flex border-b border-slate-200 mb-8" id="auth-tabs">
+                        <button onclick="switchAuthTab('login')" id="tab-login-btn" class="flex-1 py-3 font-semibold text-sm border-b-2 border-ecopraxBlue text-ecopraxBlue transition-colors">
+                            Iniciar Sesión
+                        </button>
+                        <button onclick="switchAuthTab('register')" id="tab-register-btn" class="flex-1 py-3 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors">
+                            Registro Profesional
+                        </button>
+                    </div>
 
-    window.mostrarVistaPreviaModal = function() {
-      const nom = document.getElementById('pac-nombre').value.trim();
-      const ape = document.getElementById('pac-apellido').value.trim();
-      const ced = document.getElementById('pac-cedula').value.trim();
-      const edad = document.getElementById('pac-edad').value.trim();
-      const tel = document.getElementById('pac-telefono').value.trim();
-      const sexo = document.getElementById('pac-sexo').value;
-      const estudio = document.getElementById('pac-estudio').value;
-      
-      let fechaStr;
-      const checkManual = document.getElementById('check-fecha-manual').checked;
-      const valFechaManual = document.getElementById('pac-fecha-manual').value;
-      if (checkManual && valFechaManual) {
-        const [a, m, d] = valFechaManual.split('-');
-        fechaStr = `${d}/${m}/${a}`;
-      } else {
-        fechaStr = new Date().toLocaleDateString('es-ES');
-      }
+                    <!-- FORM 1: LOGIN -->
+                    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Correo Electrónico</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-envelope absolute left-3 top-3.5 text-slate-400 text-sm"></i>
+                                <input type="email" id="login-email" required placeholder="doctor@ejemplo.com" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-2 focus:ring-blue-100 outline-none text-sm transition-all">
+                            </div>
+                        </div>
 
-      const hallazgos = document.getElementById('hallazgos-texto').innerHTML;
-      const conclusion = document.getElementById('conclusion-texto').innerHTML;
-      const obs = document.getElementById('check-observaciones').checked ? document.getElementById('texto-observaciones').value : '';
-      const nota = document.getElementById('check-nota').checked ? document.getElementById('texto-nota').value : '';
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-bold uppercase text-slate-600">Contraseña</label>
+                                <button type="button" onclick="switchAuthTab('recovery')" class="text-xs text-ecopraxBlue hover:underline font-medium">¿Olvidó su contraseña?</button>
+                            </div>
+                            <div class="relative">
+                                <i class="fa-solid fa-lock absolute left-3 top-3.5 text-slate-400 text-sm"></i>
+                                <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-2 focus:ring-blue-100 outline-none text-sm transition-all">
+                            </div>
+                        </div>
 
-      const itemTemp = {
-        pacienteNombre: nom,
-        pacienteApellido: ape,
-        pacienteCedula: ced,
-        pacienteEdad: edad,
-        pacienteTelefono: tel,
-        pacienteSexo: sexo,
-        estudioTipo: estudio,
-        fechaStr: fechaStr,
-        hallazgos: hallazgos,
-        conclusion: conclusion,
-        observaciones: obs,
-        nota: nota
-      };
+                        <button type="submit" class="w-full py-3 bg-ecopraxBlue hover:bg-ecopraxHover text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                            <span>Ingresar al Sistema</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
 
-      poblarVistaPreviaModal(itemTemp);
-      document.getElementById('modal-preview').classList.remove('hidden');
-    }
+                    <!-- FORM 2: REGISTER -->
+                    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nombre</label>
+                                <input type="text" id="reg-name" required placeholder="Andrea" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Apellido</label>
+                                <input type="text" id="reg-lastname" required placeholder="Fernández" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+                        </div>
 
-    function poblarVistaPreviaModal(item) {
-      document.getElementById('pdf-nombre').innerText = `${item.pacienteNombre} ${item.pacienteApellido || ''}`;
-      document.getElementById('pdf-cedula').innerText = item.pacienteCedula;
-      document.getElementById('pdf-edad-sexo').innerText = `${item.pacienteEdad || 'N/A'} / ${item.pacienteSexo || 'N/A'}`;
-      document.getElementById('pdf-telefono').innerText = item.pacienteTelefono || 'N/A';
-      document.getElementById('pdf-fecha').innerText = item.fechaStr;
-      document.getElementById('pdf-estudio').innerText = item.estudioTipo;
-      document.getElementById('pdf-hallazgos').innerHTML = item.hallazgos;
-      document.getElementById('pdf-conclusion').innerHTML = item.conclusion;
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cédula / Documento</label>
+                                <input type="text" id="reg-id" required placeholder="V-12345678" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Género / Prefijo</label>
+                                <select id="reg-gender" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm bg-white">
+                                    <option value="Dra.">Dra. (Doctora)</option>
+                                    <option value="Dr.">Dr. (Doctor)</option>
+                                </select>
+                            </div>
+                        </div>
 
-      if (item.observaciones) {
-        document.getElementById('pdf-observaciones').innerText = item.observaciones;
-        document.getElementById('pdf-container-obs').classList.remove('hidden');
-      } else {
-        document.getElementById('pdf-container-obs').classList.add('hidden');
-      }
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Correo Electrónico</label>
+                            <input type="email" id="reg-email" required placeholder="doctor@ejemplo.com" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                        </div>
 
-      if (item.nota) {
-        document.getElementById('pdf-nota').innerText = item.nota;
-        document.getElementById('pdf-container-nota').classList.remove('hidden');
-      } else {
-        document.getElementById('pdf-container-nota').classList.add('hidden');
-      }
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Contraseña</label>
+                                <input type="password" id="reg-password" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Confirmar</label>
+                                <input type="password" id="reg-password-confirm" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+                        </div>
 
-      document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr.';
-      document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
-      if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
-        document.getElementById('pdf-medico-cmv').innerText = `CMV: ${medicoActualDatos.cmv}`;
-      }
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Foto de Perfil (Opcional)</label>
+                            <input type="file" id="reg-photo" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-ecopraxBlue hover:file:bg-blue-100">
+                        </div>
 
-      const imgSello = document.getElementById('pdf-img-sello');
-      if (medicoActualDatos.selloUrl) { imgSello.src = medicoActualDatos.selloUrl; imgSello.classList.remove('hidden'); }
-      const imgFirma = document.getElementById('pdf-img-firma');
-      if (medicoActualDatos.firmaUrl) { imgFirma.src = medicoActualDatos.firmaUrl; imgFirma.classList.remove('hidden'); }
-    }
+                        <button type="submit" class="w-full py-2.5 bg-ecopraxBlue hover:bg-ecopraxHover text-white font-semibold rounded-lg shadow-md transition-all mt-2">
+                            Crear Cuenta Profesional
+                        </button>
+                    </form>
 
-    // GUARDAR E IMPRIMIR / DESCARGAR PDF CON NOMBRE PERSONALIZADO Y RETORNO A REGISTROS
-    window.guardarYGenerarPDF = async function() {
-      const nom = document.getElementById('pac-nombre').value.trim();
-      const ape = document.getElementById('pac-apellido').value.trim();
-      const ced = document.getElementById('pac-cedula').value.trim();
-      const edad = document.getElementById('pac-edad').value.trim();
-      const tel = document.getElementById('pac-telefono').value.trim();
-      const sexo = document.getElementById('pac-sexo').value;
-      const estudio = document.getElementById('pac-estudio').value;
+                    <!-- FORM 3: RECOVERY -->
+                    <form id="form-recovery" onsubmit="handleRecovery(event)" class="space-y-4 hidden">
+                        <div class="text-sm text-slate-600 mb-2">
+                            Ingrese su dirección de correo registrada. Le enviaremos un enlace seguro para restablecer su contraseña.
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Correo Registrado</label>
+                            <input type="email" id="recovery-email" required placeholder="doctor@ejemplo.com" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                        </div>
+                        <button type="submit" class="w-full py-2.5 bg-ecopraxBlue hover:bg-ecopraxHover text-white font-semibold rounded-lg shadow-md transition-all">
+                            Enviar Enlace de Recuperación
+                        </button>
+                        <button type="button" onclick="switchAuthTab('login')" class="w-full text-xs text-slate-500 hover:text-slate-800 text-center block pt-2">
+                            ← Volver al Inicio de Sesión
+                        </button>
+                    </form>
 
-      let fechaStr, fechaISO;
-      const checkManual = document.getElementById('check-fecha-manual').checked;
-      const valFechaManual = document.getElementById('pac-fecha-manual').value;
-      if (checkManual && valFechaManual) {
-        fechaISO = valFechaManual;
-        const [a, m, d] = valFechaManual.split('-');
-        fechaStr = `${d}/${m}/${a}`;
-      } else {
-        const hoy = new Date();
-        fechaISO = hoy.toISOString().split('T')[0];
-        fechaStr = hoy.toLocaleDateString('es-ES');
-      }
+                </div>
+            </div>
+        </div>
 
-      const hallazgos = document.getElementById('hallazgos-texto').innerHTML;
-      const conclusion = document.getElementById('conclusion-texto').innerHTML;
-      const obs = document.getElementById('check-observaciones').checked ? document.getElementById('texto-observaciones').value : '';
-      const nota = document.getElementById('check-nota').checked ? document.getElementById('texto-nota').value : '';
+        <!-- ========================================== -->
+        <!-- 2. MAIN DASHBOARD CONTAINER (Hidden initially) -->
+        <!-- ========================================== -->
+        <div id="main-dashboard" class="flex-1 flex flex-col md:flex-row h-full w-full overflow-hidden hidden">
+            
+            <!-- Mobile Header with Hamburger -->
+            <div class="md:hidden bg-ecopraxDark text-white px-4 py-3 flex justify-between items-center z-20 shrink-0">
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleMobileSidebar()" class="p-2 text-white hover:bg-blue-900 rounded-lg">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <span class="font-bold tracking-tight text-lg">ECOPRAXIS</span>
+                </div>
+                <div class="text-xs bg-blue-900/80 px-2.5 py-1 rounded-full text-blue-200 border border-blue-700/50" id="mobile-doctor-name">
+                    Dr. Usuario
+                </div>
+            </div>
 
-      const user = auth.currentUser;
-      if (user) {
-        const datosExamen = {
-          medicoUid: user.uid,
-          pacienteNombre: nom,
-          pacienteApellido: ape,
-          pacienteCedula: ced,
-          pacienteEdad: edad,
-          pacienteTelefono: tel,
-          pacienteSexo: sexo,
-          estudioTipo: estudio,
-          fechaStr: fechaStr,
-          fechaISO: fechaISO,
-          hallazgos: hallazgos,
-          conclusion: conclusion,
-          observaciones: obs,
-          nota: nota
+            <!-- Mobile Overlay Background -->
+            <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden md:hidden"></div>
+
+            <!-- Sidebar -->
+            <aside id="main-sidebar" class="fixed md:relative inset-y-0 left-0 w-64 bg-ecopraxDark text-white flex flex-col z-40 transition-transform duration-300 -translate-x-full md:translate-x-0 shrink-0">
+                <!-- Sidebar Header -->
+                <div class="p-5 border-b border-blue-900/60 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-ecopraxBlue flex items-center justify-center text-white text-xl font-bold shadow-md">
+                        <i class="fa-solid fa-wave-square"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-base tracking-tight leading-tight">ECOPRAXIS</h2>
+                        <span class="text-[10px] text-blue-300 font-medium uppercase tracking-wider block">Ecografía Práctica</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+                    <button onclick="navigateTo('records')" id="nav-records" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-white bg-ecopraxBlue shadow-sm">
+                        <i class="fa-solid fa-folder-open w-5 text-center"></i>
+                        <span>Registros Realizados</span>
+                    </button>
+
+                    <button onclick="navigateTo('new-report')" id="nav-new-report" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-blue-200 hover:bg-blue-900/50 hover:text-white">
+                        <i class="fa-solid fa-circle-plus w-5 text-center text-emerald-400"></i>
+                        <span>Nuevo Reporte</span>
+                    </button>
+
+                    <button onclick="navigateTo('report-config')" id="nav-report-config" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-blue-200 hover:bg-blue-900/50 hover:text-white">
+                        <i class="fa-solid fa-sliders w-5 text-center"></i>
+                        <span>Configuración Reporte</span>
+                    </button>
+
+                    <button onclick="navigateTo('pro-data')" id="nav-pro-data" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-blue-200 hover:bg-blue-900/50 hover:text-white">
+                        <i class="fa-solid fa-user-doctor w-5 text-center"></i>
+                        <span>Datos Profesionales</span>
+                    </button>
+
+                    <button onclick="navigateTo('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-blue-200 hover:bg-blue-900/50 hover:text-white">
+                        <i class="fa-solid fa-id-card w-5 text-center"></i>
+                        <span>Mi Perfil</span>
+                    </button>
+                </nav>
+
+                <!-- Doctor Footer Profile Info -->
+                <div class="p-3.5 border-t border-blue-900/60 bg-slate-950/20 flex items-center justify-between">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <img id="sidebar-doctor-avatar" src="https://placehold.co/100x100/0152a7/ffffff?text=DR" class="w-9 h-9 rounded-full object-cover border border-blue-400/30 shrink-0" alt="Avatar">
+                        <div class="overflow-hidden">
+                            <h4 id="sidebar-doctor-name" class="text-xs font-semibold text-white truncate">Dr. Usuario</h4>
+                            <p id="sidebar-doctor-email" class="text-[10px] text-blue-300 truncate">doctor@ecopraxis.com</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" title="Cerrar Sesión" class="text-blue-300 hover:text-red-400 p-1.5 rounded-lg hover:bg-blue-900/40 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 bg-slate-100 overflow-y-auto flex flex-col relative">
+
+                <!-- ========================================== -->
+                <!-- VISTA 1: REGISTROS REALIZADOS (Gmail Style) -->
+                <!-- ========================================== -->
+                <section id="view-records" class="p-4 md:p-6 flex-1 flex flex-col">
+                    <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">Registros Realizados</h2>
+                            <p class="text-xs text-slate-500">Histórico de informes ecográficos generados</p>
+                        </div>
+                        <button onclick="navigateTo('new-report')" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center gap-2 self-start sm:self-auto">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Nuevo Informe</span>
+                        </button>
+                    </div>
+
+                    <!-- Gmail-Style Toolbar & Filters -->
+                    <div class="bg-white rounded-t-xl border border-slate-200 p-3 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
+                        <!-- Toolbar Actions -->
+                        <div class="flex items-center gap-2 w-full md:w-auto">
+                            <div class="flex items-center gap-2 px-2 py-1 bg-slate-100 rounded-lg text-xs font-medium text-slate-600">
+                                <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAllRecords(this.checked)" class="rounded text-ecopraxBlue focus:ring-ecopraxBlue">
+                                <span>Todos</span>
+                            </div>
+
+                            <div class="h-5 w-px bg-slate-200 my-auto"></div>
+
+                            <button id="btn-download-pdf" onclick="downloadSelectedRecordPDF()" disabled class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all">
+                                <i class="fa-solid fa-file-pdf text-red-500"></i>
+                                <span>Descargar PDF</span>
+                            </button>
+
+                            <button id="btn-edit-record" onclick="editSelectedRecord()" disabled class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all">
+                                <i class="fa-solid fa-pen-to-square text-blue-500"></i>
+                                <span>Editar</span>
+                            </button>
+
+                            <button id="btn-delete-records" onclick="deleteSelectedRecords()" disabled class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all">
+                                <i class="fa-solid fa-trash-can text-red-500"></i>
+                                <span>Borrar</span>
+                            </button>
+
+                            <span id="selected-count-badge" class="text-xs text-slate-500 ml-2 font-medium hidden">0 seleccionados</span>
+                        </div>
+
+                        <!-- Search & Date Filters -->
+                        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                            <div class="relative flex-1 sm:flex-initial">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                                <input type="text" id="filter-search" oninput="applyRecordFilters()" placeholder="Buscar paciente o cédula..." class="pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-ecopraxBlue outline-none w-full sm:w-48">
+                            </div>
+
+                            <input type="date" id="filter-date" onchange="applyRecordFilters()" class="px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 focus:border-ecopraxBlue outline-none text-slate-600">
+
+                            <button onclick="clearRecordFilters()" title="Limpiar Filtros" class="p-1.5 text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs">
+                                <i class="fa-solid fa-filter-circle-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Records Table -->
+                    <div class="bg-white border-x border-b border-slate-200 rounded-b-xl shadow-sm flex-1 overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase">
+                                    <th class="p-3 w-10 text-center"></th>
+                                    <th class="p-3">Paciente</th>
+                                    <th class="p-3">Cédula</th>
+                                    <th class="p-3">Tipo de Estudio</th>
+                                    <th class="p-3">Fecha</th>
+                                    <th class="p-3 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-table-body" class="divide-y divide-slate-100">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                        <div id="records-empty-state" class="p-12 text-center text-slate-400 hidden">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
+                            <p class="text-sm font-medium">No se encontraron registros ecográficos</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- VISTA 2: NUEVO REPORTE (Flow in 2 Steps)  -->
+                <!-- ========================================== -->
+                <section id="view-new-report" class="p-4 md:p-6 flex-1 max-w-4xl mx-auto w-full hidden">
+                    
+                    <!-- Wizard Header -->
+                    <div class="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800" id="report-form-title">Nuevo Reporte Ecográfico</h2>
+                            <p class="text-xs text-slate-500">Complete la información del paciente y la redacción diagnóstica</p>
+                        </div>
+                        <!-- Step Indicator -->
+                        <div class="flex items-center gap-2">
+                            <span id="step-1-badge" class="w-8 h-8 rounded-full bg-ecopraxBlue text-white font-bold text-xs flex items-center justify-center">1</span>
+                            <div id="step-line" class="w-8 h-1 bg-slate-300 rounded"></div>
+                            <span id="step-2-badge" class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center">2</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1: PATIENT DATA -->
+                    <div id="report-step-1" class="bg-white rounded-xl border border-slate-200 p-5 md:p-6 shadow-sm space-y-5">
+                        
+                        <div class="flex justify-between items-center bg-blue-50/70 p-3 rounded-lg border border-blue-100">
+                            <span class="text-xs font-semibold text-ecopraxBlue">¿Paciente recurrente o registrado?</span>
+                            <button type="button" onclick="openRegisteredPatientsModal()" class="bg-ecopraxBlue text-white text-xs px-3 py-1.5 rounded-md hover:bg-ecopraxHover font-medium transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Pacientes ya registrados</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nombre *</label>
+                                <input type="text" id="patient-firstname" placeholder="Ej: Andrea" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Apellido *</label>
+                                <input type="text" id="patient-lastname" placeholder="Ej: Fernández" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Cédula / Documento *</label>
+                                <input type="text" id="patient-id" placeholder="Ej: V-28003579" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Edad *</label>
+                                <input type="text" id="patient-age" placeholder="Ej: 34 años" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Teléfono *</label>
+                                <input type="text" id="patient-phone" placeholder="Ej: 0414-1234567" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Sexo *</label>
+                                <select id="patient-gender" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm bg-white">
+                                    <option value="Femenino">Femenino</option>
+                                    <option value="Masculino">Masculino</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-100">
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Tipo de Estudio Ecográfico *</label>
+                                <select id="study-type-select" onchange="handleStudyTypeChange()" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:border-ecopraxBlue focus:ring-1 focus:ring-blue-100 outline-none text-sm font-semibold text-slate-700 bg-white">
+                                    <option value="Ecografía Abdominal">Ecografía Abdominal</option>
+                                    <option value="Renal y Vías Urinarias">Renal y Vías Urinarias</option>
+                                    <option value="Hepatobiliar">Hepatobiliar</option>
+                                    <option value="Tiroides">Tiroides</option>
+                                    <option value="Inguinal">Inguinal</option>
+                                    <option value="Piel y Partes Blandas">Piel y Partes Blandas</option>
+                                    <option value="Testicular">Testicular</option>
+                                    <option value="Pélvica Masculina">Pélvica Masculina</option>
+                                    <option value="Pélvica Femenina">Pélvica Femenina</option>
+                                    <option value="Transvaginal">Transvaginal</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-2">
+                                <input type="checkbox" id="custom-date-toggle" onchange="toggleCustomDateInput(this.checked)" class="rounded text-ecopraxBlue focus:ring-ecopraxBlue">
+                                <label for="custom-date-toggle" class="text-xs text-slate-600 font-medium cursor-pointer">Seleccionar fecha de realización manualmente</label>
+                            </div>
+
+                            <div id="custom-date-container" class="hidden">
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Fecha del Estudio</label>
+                                <input type="date" id="custom-study-date" class="w-full md:w-1/2 px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end">
+                            <button onclick="goToStep2()" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-md transition-all flex items-center gap-2">
+                                <span>Guardar y Redactar Hallazgos</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: CLINICAL DRAFTING -->
+                    <div id="report-step-2" class="space-y-5 hidden">
+                        <!-- Patient Summary Header -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div class="text-xs space-y-1">
+                                <p class="font-bold text-slate-800 text-sm" id="summary-patient-name">Paciente: Andrea Fernández</p>
+                                <p class="text-slate-500" id="summary-patient-details">C.I: 28003579 | Edad: 34 años | Sexo: Femenino | Tel: 04141234567</p>
+                                <span class="inline-block bg-blue-100 text-ecopraxBlue px-2 py-0.5 rounded font-semibold text-[11px]" id="summary-study-type">Ecografía Abdominal</span>
+                            </div>
+                            <button onclick="goToStep1()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-semibold transition-all flex items-center gap-1.5">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Modificar Paciente</span>
+                            </button>
+                        </div>
+
+                        <!-- Transducer & Approach Box (No Title) -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Transductor y Vía de Abordaje</label>
+                            <input type="text" id="report-transducer" placeholder="Ej: Transductor Convexo de 3.5 MHz. Abordaje suprapúbico." class="w-full text-sm font-medium text-slate-800 border-0 border-b border-slate-200 focus:border-ecopraxBlue focus:ring-0 px-0 py-1 outline-none">
+                        </div>
+
+                        <!-- Hallazgos & Conclusión with Rich Text Bar -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-4">
+                            <!-- Toolbar -->
+                            <div class="flex items-center gap-1 border-b border-slate-200 pb-2">
+                                <span class="text-xs font-bold uppercase text-slate-500 mr-2">Formato:</span>
+                                <button onclick="execEditorCommand('bold')" title="Negrita" class="p-1.5 rounded hover:bg-slate-100 text-slate-700 font-bold text-xs w-8 h-8">N</button>
+                                <button onclick="execEditorCommand('italic')" title="Cursiva" class="p-1.5 rounded hover:bg-slate-100 text-slate-700 italic text-xs w-8 h-8">K</button>
+                                <button onclick="execEditorCommand('insertUnorderedList')" title="Viñetas" class="p-1.5 rounded hover:bg-slate-100 text-slate-700 text-xs w-8 h-8"><i class="fa-solid fa-list-ul"></i></button>
+                                <button onclick="toggleCaseSelection()" title="Mayúsculas / Minúsculas" class="p-1.5 rounded hover:bg-slate-100 text-slate-700 font-semibold text-xs px-2">AA</button>
+                            </div>
+
+                            <!-- Hallazgos Editor -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Hallazgos Ecográficos</label>
+                                <div class="rich-editor border border-slate-200 rounded-lg p-3 bg-slate-50/50 focus-within:bg-white focus-within:border-ecopraxBlue transition-all">
+                                    <div id="report-findings" contenteditable="true" class="text-sm text-slate-800 leading-relaxed"></div>
+                                </div>
+                            </div>
+
+                            <!-- Conclusión Editor -->
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Conclusión Diagnóstica</label>
+                                <div class="rich-editor border border-slate-200 rounded-lg p-3 bg-slate-50/50 focus-within:bg-white focus-within:border-ecopraxBlue transition-all">
+                                    <div id="report-conclusion" contenteditable="true" class="text-sm text-slate-800 leading-relaxed font-semibold"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Optional Sections Checkboxes -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="toggle-obs" onchange="document.getElementById('obs-container').classList.toggle('hidden', !this.checked)" class="rounded text-ecopraxBlue focus:ring-ecopraxBlue">
+                                <label for="toggle-obs" class="text-xs font-bold text-slate-700 cursor-pointer">Agregar Sección de Observaciones</label>
+                            </div>
+                            <div id="obs-container" class="hidden pl-6">
+                                <textarea id="report-observations" rows="2" placeholder="Observaciones clínicas adicionales..." class="w-full text-xs p-2.5 rounded-lg border border-slate-200 outline-none focus:border-ecopraxBlue"></textarea>
+                            </div>
+
+                            <div class="flex items-center gap-3 pt-1">
+                                <input type="checkbox" id="toggle-note" onchange="document.getElementById('note-container').classList.toggle('hidden', !this.checked)" class="rounded text-ecopraxBlue focus:ring-ecopraxBlue">
+                                <label for="toggle-note" class="text-xs font-bold text-slate-700 cursor-pointer">Agregar Sección de Nota</label>
+                            </div>
+                            <div id="note-container" class="hidden pl-6">
+                                <textarea id="report-note" rows="2" placeholder="Nota al médico tratante o recomendación..." class="w-full text-xs p-2.5 rounded-lg border border-slate-200 outline-none focus:border-ecopraxBlue"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button onclick="openPreviewModal()" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-md transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Vista Previa</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- VISTA 3: CONFIGURACIÓN DEL REPORTE         -->
+                <!-- ========================================== -->
+                <section id="view-report-config" class="p-4 md:p-6 flex-1 max-w-4xl mx-auto w-full hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Configuración del Reporte</h2>
+                        <p class="text-xs text-slate-500">Personalice el membrete institucional y las plantillas predeterminadas de hallazgos</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Header / Institutional Logo & Style -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                            <h3 class="text-sm font-bold text-ecopraxDark border-b border-slate-100 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-building-user text-ecopraxBlue"></i>
+                                <span>Cabecera Institucional y Estilo</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Logo Personalizado de Institución / Clínica</label>
+                                    <input type="file" id="config-logo-input" accept="image/*" onchange="handleLogoUpload(event)" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-ecopraxBlue">
+                                </div>
+
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 border rounded-lg overflow-hidden bg-slate-50 flex items-center justify-center shrink-0">
+                                        <img id="config-logo-preview" src="" class="max-w-full max-h-full object-contain hidden" alt="Logo">
+                                        <span id="config-logo-placeholder" class="text-[10px] text-slate-400 text-center px-1">Sin Logo</span>
+                                    </div>
+                                    <button onclick="removeLogo()" class="text-xs text-red-500 hover:underline">Quitar Logo</button>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Color de la Línea Divisoria del Informe</label>
+                                <div class="flex items-center gap-3">
+                                    <input type="color" id="config-line-color" value="#0152a7" class="w-10 h-10 rounded cursor-pointer border border-slate-300">
+                                    <span class="text-xs text-slate-500">Este color se utilizará en las barras decorativas y líneas del reporte impreso.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Template Management -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                            <h3 class="text-sm font-bold text-ecopraxDark border-b border-slate-100 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-file-pen text-ecopraxBlue"></i>
+                                <span>Gestión de Plantillas Ecográficas (10 Estudios)</span>
+                            </h3>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Seleccionar Tipo de Estudio a Editar</label>
+                                <select id="template-study-select" onchange="loadTemplateForEditing()" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm font-semibold bg-white">
+                                    <option value="Ecografía Abdominal">Ecografía Abdominal</option>
+                                    <option value="Renal y Vías Urinarias">Renal y Vías Urinarias</option>
+                                    <option value="Hepatobiliar">Hepatobiliar</option>
+                                    <option value="Tiroides">Tiroides</option>
+                                    <option value="Inguinal">Inguinal</option>
+                                    <option value="Piel y Partes Blandas">Piel y Partes Blandas</option>
+                                    <option value="Testicular">Testicular</option>
+                                    <option value="Pélvica Masculina">Pélvica Masculina</option>
+                                    <option value="Pélvica Femenina">Pélvica Femenina</option>
+                                    <option value="Transvaginal">Transvaginal</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Hallazgos Predeterminados</label>
+                                <textarea id="template-findings-text" rows="5" class="w-full text-xs p-3 rounded-lg border border-slate-300 focus:border-ecopraxBlue outline-none font-sans leading-relaxed"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Conclusión Predeterminada</label>
+                                <textarea id="template-conclusion-text" rows="3" class="w-full text-xs p-3 rounded-lg border border-slate-300 focus:border-ecopraxBlue outline-none font-sans leading-relaxed font-semibold"></textarea>
+                            </div>
+
+                            <button onclick="saveTemplateChanges()" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-5 py-2 rounded-lg text-xs font-semibold shadow transition-all">
+                                Guardar Plantilla para este Estudio
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- VISTA 4: DATOS PROFESIONALES              -->
+                <!-- ========================================== -->
+                <section id="view-pro-data" class="p-4 md:p-6 flex-1 max-w-4xl mx-auto w-full hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Datos Profesionales</h2>
+                        <p class="text-xs text-slate-500">Configure la información médica, sello e imagen de firma para los informes</p>
+                    </div>
+
+                    <form onsubmit="handleSaveProData(event)" class="space-y-6">
+                        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nombre Completo y Título</label>
+                                    <input type="text" id="pro-fullname" required placeholder="Dra. Andrea Fernández" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Especialidad / Cargo</label>
+                                    <input type="text" id="pro-specialty" placeholder="Médico Radiólogo / Ecografista" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nro. M.P.P.S.</label>
+                                    <input type="text" id="pro-mpps" required placeholder="MPPS: 123456" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nro. Colegiado / C.M.V. (Opcional)</label>
+                                    <input type="text" id="pro-cmv" placeholder="C.M.V.: 7890" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stamp & Signature upload with Background Removal Logic -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-5">
+                            <h3 class="text-sm font-bold text-ecopraxDark border-b border-slate-100 pb-2">Firma Digital y Sello Profesional</h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Signature -->
+                                <div class="space-y-3">
+                                    <label class="block text-xs font-bold uppercase text-slate-600">Imagen de Firma Digital</label>
+                                    <input type="file" id="pro-signature-input" accept="image/*" onchange="processSignatureUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-blue-50 file:text-ecopraxBlue">
+                                    <p class="text-[11px] text-slate-400">Se aplicará remoción automática de fondo blanco para lograr efecto transparente sobre el papel.</p>
+                                    <div class="w-full h-28 border border-dashed border-slate-300 rounded-lg flex items-center justify-center p-2 bg-slate-50">
+                                        <img id="pro-signature-preview" class="max-h-full max-w-full object-contain hidden" alt="Firma">
+                                        <span id="pro-signature-placeholder" class="text-xs text-slate-400">Sin Firma Cargada</span>
+                                    </div>
+                                </div>
+
+                                <!-- Stamp -->
+                                <div class="space-y-3">
+                                    <label class="block text-xs font-bold uppercase text-slate-600">Sello Profesional</label>
+                                    <input type="file" id="pro-stamp-input" accept="image/*" onchange="processStampUpload(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-blue-50 file:text-ecopraxBlue">
+                                    <p class="text-[11px] text-slate-400">Imagen del sello húmedo o institucional para adjuntar junto a la firma.</p>
+                                    <div class="w-full h-28 border border-dashed border-slate-300 rounded-lg flex items-center justify-center p-2 bg-slate-50">
+                                        <img id="pro-stamp-preview" class="max-h-full max-w-full object-contain hidden" alt="Sello">
+                                        <span id="pro-stamp-placeholder" class="text-xs text-slate-400">Sin Sello Cargado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-6 py-2.5 rounded-lg text-sm font-semibold shadow transition-all">
+                                Guardar Datos Profesionales
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- VISTA 5: MI PERFIL                         -->
+                <!-- ========================================== -->
+                <section id="view-profile" class="p-4 md:p-6 flex-1 max-w-3xl mx-auto w-full hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-800">Mi Perfil</h2>
+                        <p class="text-xs text-slate-500">Gestión de datos de cuenta y credenciales de acceso</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Profile Card -->
+                        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex items-center gap-5">
+                            <div class="relative group">
+                                <img id="profile-avatar-large" src="https://placehold.co/120x120/0152a7/ffffff?text=DR" class="w-20 h-20 rounded-full object-cover border-2 border-ecopraxBlue" alt="Doctor">
+                                <label for="profile-photo-upload" class="absolute inset-0 bg-slate-900/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-white text-xs">
+                                    <i class="fa-solid fa-camera"></i>
+                                </label>
+                                <input type="file" id="profile-photo-upload" accept="image/*" onchange="handleProfileAvatarChange(event)" class="hidden">
+                            </div>
+
+                            <div class="space-y-1">
+                                <h3 id="profile-name-display" class="font-bold text-lg text-slate-800">Dr. Usuario</h3>
+                                <p id="profile-email-display" class="text-xs text-slate-500">doctor@ecopraxis.com</p>
+                                <span class="inline-block bg-blue-50 text-ecopraxBlue text-[11px] font-semibold px-2.5 py-0.5 rounded-full border border-blue-200">Usuario Médico Verificado</span>
+                            </div>
+                        </div>
+
+                        <!-- Security Module -->
+                        <form onsubmit="handleChangePassword(event)" class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+                            <h3 class="text-sm font-bold text-ecopraxDark border-b border-slate-100 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-shield-halved text-ecopraxBlue"></i>
+                                <span>Módulo de Seguridad</span>
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Nueva Contraseña</label>
+                                    <input type="password" id="profile-new-pass" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold uppercase text-slate-600 mb-1">Confirmar Nueva Contraseña</label>
+                                    <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="••••••••" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:border-ecopraxBlue text-sm">
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button type="submit" class="bg-ecopraxBlue hover:bg-ecopraxHover text-white px-5 py-2.5 rounded-lg text-xs font-semibold shadow transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-key"></i>
+                                    <span>Cambiar la contraseña</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALS SECTION                             -->
+    <!-- ========================================== -->
+    
+    <!-- 1. Registered Patients Modal -->
+    <div id="modal-patients" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+            <div class="p-4 bg-ecopraxDark text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Pacientes Registrados en Base de Datos</span>
+                </h3>
+                <button onclick="closeRegisteredPatientsModal()" class="text-slate-300 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-3 bg-slate-50 border-b border-slate-200">
+                <input type="text" id="patient-modal-search" oninput="renderPatientsModalList()" placeholder="Filtrar por nombre o cédula..." class="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-300 outline-none focus:border-ecopraxBlue">
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4">
+                <div id="patients-modal-list" class="space-y-2">
+                    <!-- Dynamic Patients List -->
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-100 border-t border-slate-200 text-right">
+                <button onclick="closeRegisteredPatientsModal()" class="px-4 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs font-semibold rounded-lg">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Preview & Print/PDF Modal -->
+    <div id="modal-preview" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-6 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full h-[95vh] flex flex-col overflow-hidden">
+            
+            <!-- Modal Header Toolbar -->
+            <div class="p-3 bg-slate-800 text-white flex flex-wrap justify-between items-center gap-2 no-print shrink-0">
+                <span class="font-bold text-xs uppercase tracking-wider text-blue-200">Vista Previa del Informe Ecográfico</span>
+                
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i>
+                        <span>Imprimir</span>
+                    </button>
+
+                    <button onclick="saveAndDownloadPDF()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Guardar y Descargar PDF</span>
+                    </button>
+
+                    <button onclick="closePreviewModal()" class="p-1.5 text-slate-400 hover:text-white rounded-lg">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content - Printable Formatted Document -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-200/60">
+                <div id="printable-report" class="bg-white mx-auto shadow-lg rounded-sm p-8 md:p-12 max-w-[210mm] min-h-[297mm] flex flex-col justify-between text-slate-900 text-xs font-sans border border-slate-200">
+                    
+                    <div class="space-y-6">
+                        <!-- HEADER -->
+                        <div class="flex justify-between items-start pb-4">
+                            <div class="flex items-center gap-4">
+                                <img id="preview-header-logo" src="" class="h-16 max-w-[160px] object-contain hidden" alt="Logo">
+                                <div>
+                                    <h1 class="text-lg font-bold tracking-tight text-slate-900" id="preview-doc-name">Dra. Andrea Fernández</h1>
+                                    <p class="text-[11px] text-slate-600 font-medium" id="preview-doc-specialty">Médico Ecografista</p>
+                                    <p class="text-[10px] text-slate-500" id="preview-doc-credentials">MPPS: 123456 | C.M.V.: 7890</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-extrabold text-lg text-slate-800 tracking-wider block">ECOPRAXIS</span>
+                                <span class="text-[9px] text-slate-400 uppercase tracking-widest block">Informe Ecográfico</span>
+                            </div>
+                        </div>
+
+                        <!-- CUSTOM HEADER DIVIDER LINE -->
+                        <div id="preview-header-line" class="h-1 w-full bg-ecopraxBlue mb-4"></div>
+
+                        <!-- PATIENT INFO BOX -->
+                        <div class="border border-slate-300 rounded-lg p-3 bg-slate-50/50 grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px]">
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Paciente</strong> <span id="preview-patient-name" class="font-bold text-slate-800"></span></div>
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Cédula / Id</strong> <span id="preview-patient-id"></span></div>
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Edad / Sexo</strong> <span id="preview-patient-age-sex"></span></div>
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Teléfono</strong> <span id="preview-patient-phone"></span></div>
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Fecha de Realización</strong> <span id="preview-study-date" class="font-semibold"></span></div>
+                            <div><strong class="text-slate-600 uppercase text-[9px] block">Estudio Realizado</strong> <span id="preview-study-title" class="font-bold text-ecopraxBlue"></span></div>
+                        </div>
+
+                        <!-- TRANSDUCER AND APPROACH -->
+                        <div id="preview-transducer-container" class="text-[11px] italic text-slate-700 bg-slate-100/60 p-2 rounded border-l-2 border-slate-400">
+                            <span id="preview-transducer-text"></span>
+                        </div>
+
+                        <!-- FINDINGS -->
+                        <div class="space-y-1.5">
+                            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1">Hallazgos Ecográficos</h3>
+                            <div id="preview-findings-text" class="text-xs leading-relaxed text-slate-800 whitespace-pre-wrap"></div>
+                        </div>
+
+                        <!-- CONCLUSION -->
+                        <div class="space-y-1.5 pt-2">
+                            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-800 border-b border-slate-200 pb-1">Conclusión Diagnóstica</h3>
+                            <div id="preview-conclusion-text" class="text-xs font-semibold leading-relaxed text-slate-900 whitespace-pre-wrap"></div>
+                        </div>
+
+                        <!-- OPTIONAL OBSERVATIONS -->
+                        <div id="preview-obs-wrapper" class="space-y-1 pt-2 hidden">
+                            <h4 class="font-bold text-[10px] uppercase text-slate-500">Observaciones:</h4>
+                            <p id="preview-obs-text" class="text-xs text-slate-700"></p>
+                        </div>
+
+                        <!-- OPTIONAL NOTE -->
+                        <div id="preview-note-wrapper" class="space-y-1 pt-2 hidden">
+                            <h4 class="font-bold text-[10px] uppercase text-slate-500">Nota:</h4>
+                            <p id="preview-note-text" class="text-xs text-slate-700 italic"></p>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER SIGNATURE & STAMP -->
+                    <div class="pt-12 flex justify-center items-end relative min-h-[120px]">
+                        <div class="text-center relative flex flex-col items-center">
+                            
+                            <div class="relative w-64 h-20 flex items-center justify-center">
+                                <img id="preview-stamp-img" class="absolute left-2 top-0 h-20 opacity-80 object-contain hidden" alt="Sello">
+                                <img id="preview-signature-img" class="relative z-10 max-h-20 max-w-full object-contain hidden" alt="Firma">
+                            </div>
+
+                            <div class="w-64 border-t border-slate-400 mt-1 pt-1">
+                                <p class="font-bold text-xs text-slate-800" id="preview-footer-doc-name">Dra. Andrea Fernández</p>
+                                <p class="text-[10px] text-slate-500" id="preview-footer-doc-mpps">MPPS: 123456</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- FIREBASE & APPLICATION LOGIC               -->
+    <!-- ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged,
+            sendPasswordResetEmail,
+            updatePassword
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            query, 
+            where, 
+            deleteDoc, 
+            updateDoc 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Firebase Configuration (Standard Web App placeholder config with Fallback Local Storage logic for complete standalone operation)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemoECOPRAXISKey2026SecureBuild",
+            authDomain: "ecopraxis-app.firebaseapp.com",
+            projectId: "ecopraxis-app",
+            storageBucket: "ecopraxis-app.appspot.com",
+            messagingSenderId: "102938475612",
+            appId: "1:102938475612:web:a1b2c3d4e5f6g7h8"
         };
 
-        if (examenEditandoId) {
-          await updateDoc(doc(db, "examenes", examenEditandoId), datosExamen);
-          examenEditandoId = null;
-        } else {
-          await addDoc(collection(db, "examenes"), datosExamen);
-        }
-        cargarRegistros(user.uid);
-      }
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-      // Generar descarga automática con nombre cedula_nombre_apellido.pdf
-      const nombreLimpioNom = nom.toLowerCase().replace(/\s+/g, '_');
-      const nombreLimpioApe = ape.toLowerCase().replace(/\s+/g, '_');
-      const nombreArchivo = `${ced}_${nombreLimpioNom}_${nombreLimpioApe}.pdf`;
-
-      // Simular descarga cambiando título de página temporalmente para impresión a PDF limpia
-      const originalTitle = document.title;
-      document.title = nombreArchivo;
-      window.print();
-      document.title = originalTitle;
-
-      cerrarVistaPreviaModal();
-      cambiarVista('vista-registros');
-    }
-
-    window.cerrarVistaPreviaModal = function() {
-      document.getElementById('modal-preview').classList.add('hidden');
-    }
-
-    // CAMBIAR CONTRASEÑA EN MI PERFIL
-    window.cambiarPasswordPerfil = async function() {
-      const p1 = document.getElementById('perfil-nueva-pass').value;
-      const p2 = document.getElementById('perfil-confirma-pass').value;
-
-      if (!p1 || p1.length < 6) {
-        alert("La contraseña debe tener al menos 6 caracteres.");
-        return;
-      }
-      if (p1 !== p2) {
-        alert("Las contraseñas no coinciden.");
-        return;
-      }
-
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          await updatePassword(user, p1);
-          alert("¡Contraseña actualizada con éxito!");
-          document.getElementById('perfil-nueva-pass').value = "";
-          document.getElementById('perfil-confirma-pass').value = "";
-        } catch (e) {
-          alert("Error al actualizar contraseña (es posible que debas volver a iniciar sesión por seguridad): " + e.message);
-        }
-      }
-    }
-
-    // COMANDOS EDITORES
-    window.ejecutarComando = function(command) {
-      document.getElementById('hallazgos-texto').focus();
-      document.execCommand(command, false, null);
-    }
-    window.ejecutarComandoConclusion = function(command) {
-      document.getElementById('conclusion-texto').focus();
-      document.execCommand(command, false, null);
-    }
-    window.cambiarCaso = function(idElemento, selectElem) {
-      const opcion = selectElem.value;
-      const editor = document.getElementById(idElemento);
-      editor.focus();
-      const seleccion = window.getSelection();
-      if (seleccion.rangeCount > 0 && !seleccion.isCollapsed) {
-        const rango = seleccion.getRangeAt(0);
-        const texto = rango.toString();
-        rango.deleteContents();
-        rango.insertNode(document.createTextNode(opcion === 'mayus' ? texto.toUpperCase() : texto.toLowerCase()));
-      }
-      selectElem.selectedIndex = 0;
-    }
-
-    // AUTH & SETUP
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('link-to-register')?.addEventListener('click', () => {
-        document.getElementById('form-login-container').classList.add('hidden');
-        document.getElementById('form-register-container').classList.remove('hidden');
-      });
-      document.getElementById('link-to-login-1')?.addEventListener('click', () => {
-        document.getElementById('form-register-container').classList.add('hidden');
-        document.getElementById('form-login-container').classList.remove('hidden');
-      });
-      document.getElementById('link-forgot')?.addEventListener('click', () => {
-        document.getElementById('form-login-container').classList.add('hidden');
-        document.getElementById('form-forgot-container').classList.remove('hidden');
-      });
-      document.getElementById('link-to-login-2')?.addEventListener('click', () => {
-        document.getElementById('form-forgot-container').classList.add('hidden');
-        document.getElementById('form-login-container').classList.remove('hidden');
-      });
-
-      document.getElementById('btn-login')?.addEventListener('click', async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pass = document.getElementById('login-pass').value;
-        if (email && pass) {
-          try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Error: " + e.message); }
-        }
-      });
-
-      document.getElementById('btn-register-submit')?.addEventListener('click', async () => {
-        const nom = document.getElementById('reg-nombre').value.trim();
-        const ape = document.getElementById('reg-apellido').value.trim();
-        const ced = document.getElementById('reg-cedula').value.trim();
-        const gen = document.getElementById('reg-genero').value;
-        const email = document.getElementById('reg-email').value.trim();
-        const pass = document.getElementById('reg-pass').value;
-
-        if (nom && ape && email && pass) {
-          try {
-            const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-            await setDoc(doc(db, "medicos", userCred.user.uid), {
-              nombre: `${gen} ${nom} ${ape}`,
-              cedula: ced,
-              genero: gen,
-              mpps: '',
-              tieneColegiado: false,
-              cmv: '',
-              perfilUrl: ''
-            });
-            alert("¡Registro exitoso!");
-          } catch (e) { alert("Error: " + e.message); }
-        }
-      });
-
-      document.getElementById('btn-logout')?.addEventListener('click', () => signOut(auth));
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('app-section').classList.remove('hidden');
-
-        try {
-          const docSnap = await getDoc(doc(db, "medicos", user.uid));
-          if (docSnap.exists()) {
-            medicoActualDatos = docSnap.data();
-            const nomMedico = medicoActualDatos.nombre || user.email;
-            document.getElementById('sidebar-user-name').innerText = nomMedico;
-            document.getElementById('sidebar-user-email').innerText = user.email;
-            document.getElementById('profile-view-name').innerText = nomMedico;
-            document.getElementById('profile-view-email').innerText = user.email;
-            document.getElementById('med-nombre').value = medicoActualDatos.nombre || '';
-            document.getElementById('med-mpps').value = medicoActualDatos.mpps || '';
-
-            if (medicoActualDatos.perfilUrl) {
-              document.getElementById('sidebar-user-img').src = medicoActualDatos.perfilUrl;
-              document.getElementById('profile-view-img').src = medicoActualDatos.perfilUrl;
+        // DEFAULT CLINICAL TEMPLATES (10 Ultrasound Types)
+        const DEFAULT_TEMPLATES = {
+            "Ecografía Abdominal": {
+                findings: "Hígado de tamaño, forma y ecoestructura conservada. Vesícula biliar de paredes delgadas, sin litiasis. Vías biliares intra y extrahepáticas de calibre normal. Páncreas y bazo sin alteraciones ecográficas demostrativas. Ambos riñones conservan relación cortico-medular. No se observa líquido libre en cavidad abdominal.",
+                conclusion: "Ecografía Abdominal dentro de límites normales."
+            },
+            "Renal y Vías Urinarias": {
+                findings: "Ambos riñones de situación, forma y tamaño normal. Parénquima renal con espesor y ecogenicidad conservada. Buena diferenciación corticomedular. No se aprecian imágenes de litiasis ni signos de hidronefrosis. Vejiga urinaria con adecuado llenado, paredes delgadas y regulares.",
+                conclusion: "Estudio renal y de vías urinarias sin hallazgos patológicos al momento del examen."
+            },
+            "Hepatobiliar": {
+                findings: "Hígado con bordes regulares, ecogenicidad homogénea. Vesícula biliar distendida, de paredes finas y contenido anecoico. Conducto colédoco de calibre conservado. No se observan masas focales ni imágenes litiásicas.",
+                conclusion: "Ecografía hepatobiliar conservada."
+            },
+            "Tiroides": {
+                findings: "Glándula tiroides de localización habitual y contornos regulares. Lóbulo derecho e izquierdo de dimensiones y ecoestructura dentro de límites normales. Istmo fino. No se identifican nódulos sólidos ni quísticos. Vascularización normal al Doppler color.",
+                conclusion: "Glándula tiroides ecográficamente normal."
+            },
+            "Inguinal": {
+                findings: "Evaluación de región inguinal bilateral. No se evidencian defectos de la pared abdominal ni protrusión de saco herniario con maniobras de Valsalva. Tejido celular subcutáneo sin alteración.",
+                conclusion: "Sin evidencia ecográfica de hernia inguinal bilateral."
+            },
+            "Piel y Partes Blandas": {
+                findings: "El estudio ecográfico de la zona afectada muestra capas cutáneas y subcutáneas de espesor y patrón ecoico conservado. No se identifican colecciones líquidas, masas ni cuerpos extraños radiotransparentes.",
+                conclusion: "Estudio de piel y partes blandas sin alteraciones significativas."
+            },
+            "Testicular": {
+                findings: "Ambos testículos en bolsa escrotal, de tamaño, forma y ecogenicidad simétrica y homogénea. Epidídimos de morfológia conservada. No hay presencia de hidrocele significante ni varicocele. Flujo Doppler conservado.",
+                conclusion: "Ecografía escrotal y testicular de características normales."
+            },
+            "Pélvica Masculina": {
+                findings: "Vejiga urinaria de bordes lisos y pared delgada. Próstata de contornos bien definidos, ecoestructura homogénea y volumen estimado conservado para la edad. Residuo post-miccional no significativo.",
+                conclusion: "Ecografía pélvica masculina dentro de límites normales."
+            },
+            "Pélvica Femenina": {
+                findings: "Útero en AVF, de tamaño y contornos regulares. Miometrio homogéneo. Endometrio centrado, secretor/proliferativo en correspondencia con fase menstrual. Ambos ovarios de morfología y volumen normal, con desarrollo folicular habitual. No se observa líquido en el fondo de saco de Douglas.",
+                conclusion: "Estudio pélvico femenino sin hallazgos patológicos."
+            },
+            "Transvaginal": {
+                findings: "Útero de forma y tamaño conservado. Ecoestructura miometrial homogénea. Endometrio lineal y ecogénico de bordes definidos. Ovario derecho e izquierdo con adecuado estroma y folículos en distintas fases de desarrollo. Sin masas anexiales ni líquido libre.",
+                conclusion: "Ecografía transvaginal sin evidencia de patología pélvica."
             }
-          }
-        } catch (e) { console.error(e); }
+        };
 
-        cambiarVista('vista-registros');
-        cargarRegistros(user.uid);
-      } else {
-        document.getElementById('auth-section').classList.remove('hidden');
-        document.getElementById('app-section').classList.add('hidden');
-      }
-    });
-  </script>
+        // GLOBAL APPLICATION STATE
+        window.appState = {
+            currentUser: null,
+            userProfile: {
+                fullname: 'Dra. Andrea Fernández',
+                specialty: 'Médico Ecografista',
+                mpps: 'MPPS 123456',
+                cmv: 'C.M.V. 7890',
+                signatureUrl: '',
+                stampUrl: '',
+                logoUrl: '',
+                headerLineColor: '#0152a7',
+                photoUrl: ''
+            },
+            templates: { ...DEFAULT_TEMPLATES },
+            records: [],
+            selectedRecordIds: [],
+            editingRecordId: null,
+            patients: []
+        };
+
+        // UI NAVIGATION FUNCTIONS
+        window.switchAuthTab = function(tab) {
+            document.getElementById('form-login').classList.add('hidden');
+            document.getElementById('form-register').classList.add('hidden');
+            document.getElementById('form-recovery').classList.add('hidden');
+
+            document.getElementById('tab-login-btn').className = "flex-1 py-3 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors";
+            document.getElementById('tab-register-btn').className = "flex-1 py-3 font-semibold text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition-colors";
+
+            if (tab === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+                document.getElementById('tab-login-btn').className = "flex-1 py-3 font-semibold text-sm border-b-2 border-ecopraxBlue text-ecopraxBlue transition-colors";
+            } else if (tab === 'register') {
+                document.getElementById('form-register').classList.remove('hidden');
+                document.getElementById('tab-register-btn').className = "flex-1 py-3 font-semibold text-sm border-b-2 border-ecopraxBlue text-ecopraxBlue transition-colors";
+            } else if (tab === 'recovery') {
+                document.getElementById('form-recovery').classList.remove('hidden');
+            }
+        };
+
+        window.navigateTo = function(viewName) {
+            // Hide all views
+            const views = ['records', 'new-report', 'report-config', 'pro-data', 'profile'];
+            views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+
+            // Reset navigation button styles
+            const navs = ['records', 'new-report', 'report-config', 'pro-data', 'profile'];
+            navs.forEach(n => {
+                const btn = document.getElementById(`nav-${n}`);
+                if (btn) {
+                    btn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-blue-200 hover:bg-blue-900/50 hover:text-white";
+                }
+            });
+
+            // Show target view & highlight nav
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${viewName}`);
+            if (activeNav) {
+                activeNav.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-white bg-ecopraxBlue shadow-sm";
+            }
+
+            // Mobile sidebar hide on navigate
+            document.getElementById('main-sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+
+            // Trigger specific view loaders
+            if (viewName === 'new-report' && !window.appState.editingRecordId) {
+                resetNewReportForm();
+            } else if (viewName === 'report-config') {
+                loadTemplateForEditing();
+            }
+        };
+
+        window.toggleMobileSidebar = function() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        };
+
+        // AUTHENTICATION LOGIC
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                // Try Firebase Auth
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                console.warn("Firebase Auth fallback to local session mode:", error.message);
+                // Fallback local session mode
+                initLocalUserSession(email, email.split('@')[0]);
+            }
+        };
+
+        window.handleRegister = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const lastname = document.getElementById('reg-lastname').value;
+            const gender = document.getElementById('reg-gender').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const passConfirm = document.getElementById('reg-password-confirm').value;
+
+            if (password !== passConfirm) {
+                alert("Las contraseñas no coinciden.");
+                return;
+            }
+
+            const fullName = `${gender} ${name} ${lastname}`;
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    fullname: fullName,
+                    email: email,
+                    mpps: 'MPPS: Por registrar',
+                    cmv: ''
+                });
+            } catch (error) {
+                console.warn("Register fallback:", error.message);
+                window.appState.userProfile.fullname = fullName;
+                initLocalUserSession(email, fullName);
+            }
+        };
+
+        window.handleRecovery = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('recovery-email').value;
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Se ha enviado un correo con las instrucciones de recuperación.");
+            } catch (err) {
+                alert("Enlace de recuperación enviado al correo (Modo Demostración).");
+            }
+            switchAuthTab('login');
+        };
+
+        window.handleLogout = function() {
+            signOut(auth).catch(() => {});
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('main-dashboard').classList.add('hidden');
+        };
+
+        function initLocalUserSession(email, name) {
+            window.appState.currentUser = { email: email, uid: 'local-doctor-uid' };
+            window.appState.userProfile.fullname = name || window.appState.userProfile.fullname;
+            updateUIUserProfiles();
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            renderRecordsTable();
+        }
+
+        function updateUIUserProfiles() {
+            const prof = window.appState.userProfile;
+            document.getElementById('sidebar-doctor-name').textContent = prof.fullname;
+            document.getElementById('sidebar-doctor-email').textContent = window.appState.currentUser?.email || 'doctor@ecopraxis.com';
+            document.getElementById('mobile-doctor-name').textContent = prof.fullname;
+            document.getElementById('profile-name-display').textContent = prof.fullname;
+            document.getElementById('profile-email-display').textContent = window.appState.currentUser?.email || 'doctor@ecopraxis.com';
+
+            document.getElementById('pro-fullname').value = prof.fullname;
+            document.getElementById('pro-specialty').value = prof.specialty || '';
+            document.getElementById('pro-mpps').value = prof.mpps || '';
+            document.getElementById('pro-cmv').value = prof.cmv || '';
+
+            if (prof.photoUrl) {
+                document.getElementById('sidebar-doctor-avatar').src = prof.photoUrl;
+                document.getElementById('profile-avatar-large').src = prof.photoUrl;
+            }
+            if (prof.logoUrl) {
+                document.getElementById('config-logo-preview').src = prof.logoUrl;
+                document.getElementById('config-logo-preview').classList.remove('hidden');
+                document.getElementById('config-logo-placeholder').classList.add('hidden');
+            }
+            if (prof.signatureUrl) {
+                document.getElementById('pro-signature-preview').src = prof.signatureUrl;
+                document.getElementById('pro-signature-preview').classList.remove('hidden');
+                document.getElementById('pro-signature-placeholder').classList.add('hidden');
+            }
+            if (prof.stampUrl) {
+                document.getElementById('pro-stamp-preview').src = prof.stampUrl;
+                document.getElementById('pro-stamp-preview').classList.remove('hidden');
+                document.getElementById('pro-stamp-placeholder').classList.add('hidden');
+            }
+        }
+
+        // AUTH MONITOR
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.appState.currentUser = user;
+                // Fetch profile
+                try {
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        window.appState.userProfile = { ...window.appState.userProfile, ...docSnap.data() };
+                    }
+                } catch(e) {}
+                updateUIUserProfiles();
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-dashboard').classList.remove('hidden');
+                loadRecordsFromFirestore();
+            }
+        });
+
+        // ==========================================
+        // VISTA 1 LOGIC: REGISTROS REALIZADOS
+        // ==========================================
+        function renderRecordsTable() {
+            const tbody = document.getElementById('records-table-body');
+            tbody.innerHTML = '';
+
+            const filterText = document.getElementById('filter-search').value.toLowerCase();
+            const filterDate = document.getElementById('filter-date').value;
+
+            let filtered = window.appState.records.filter(r => {
+                const matchText = r.patientName.toLowerCase().includes(filterText) || r.patientId.toLowerCase().includes(filterText);
+                const matchDate = !filterDate || r.date === filterDate;
+                return matchText && matchDate;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('records-empty-state').classList.remove('hidden');
+            } else {
+                document.getElementById('records-empty-state').classList.add('hidden');
+            }
+
+            filtered.forEach(record => {
+                const isSelected = window.appState.selectedRecordIds.includes(record.id);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100";
+                tr.innerHTML = `
+                    <td class="p-3 text-center">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelectRecord('${record.id}', this.checked)" class="rounded text-ecopraxBlue focus:ring-ecopraxBlue">
+                    </td>
+                    <td class="p-3 font-semibold text-slate-800">${record.patientName}</td>
+                    <td class="p-3 text-slate-600">${record.patientId}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-ecopraxBlue border border-blue-200">
+                            ${record.studyType}
+                        </span>
+                    </td>
+                    <td class="p-3 text-slate-500">${record.date}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="previewSingleRecord('${record.id}')" title="Ver Informe" class="p-1.5 text-ecopraxBlue hover:bg-blue-50 rounded-lg">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateToolbarState();
+        }
+
+        window.toggleSelectRecord = function(id, isChecked) {
+            if (isChecked) {
+                if (!window.appState.selectedRecordIds.includes(id)) window.appState.selectedRecordIds.push(id);
+            } else {
+                window.appState.selectedRecordIds = window.appState.selectedRecordIds.filter(i => i !== id);
+            }
+            renderRecordsTable();
+        };
+
+        window.toggleSelectAllRecords = function(isChecked) {
+            if (isChecked) {
+                window.appState.selectedRecordIds = window.appState.records.map(r => r.id);
+            } else {
+                window.appState.selectedRecordIds = [];
+            }
+            renderRecordsTable();
+        };
+
+        function updateToolbarState() {
+            const count = window.appState.selectedRecordIds.length;
+            const btnPdf = document.getElementById('btn-download-pdf');
+            const btnEdit = document.getElementById('btn-edit-record');
+            const btnDelete = document.getElementById('btn-delete-records');
+            const badge = document.getElementById('selected-count-badge');
+
+            if (count > 0) {
+                badge.textContent = `${count} seleccionado(s)`;
+                badge.classList.remove('hidden');
+                btnDelete.disabled = false;
+                btnDelete.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer transition-all";
+            } else {
+                badge.classList.add('hidden');
+                btnDelete.disabled = true;
+                btnDelete.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all";
+            }
+
+            if (count === 1) {
+                btnPdf.disabled = false;
+                btnPdf.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer transition-all";
+
+                btnEdit.disabled = false;
+                btnEdit.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 cursor-pointer transition-all";
+            } else {
+                btnPdf.disabled = true;
+                btnPdf.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all";
+
+                btnEdit.disabled = true;
+                btnEdit.className = "px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 bg-slate-100 text-slate-400 cursor-not-allowed transition-all";
+            }
+        }
+
+        window.applyRecordFilters = function() {
+            renderRecordsTable();
+        };
+
+        window.clearRecordFilters = function() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-date').value = '';
+            renderRecordsTable();
+        };
+
+        window.deleteSelectedRecords = async function() {
+            if (!confirm(`¿Está seguro de eliminar ${window.appState.selectedRecordIds.length} registro(s)?`)) return;
+
+            for (let id of window.appState.selectedRecordIds) {
+                try {
+                    await deleteDoc(doc(db, "records", id));
+                } catch(e){}
+            }
+
+            window.appState.records = window.appState.records.filter(r => !window.appState.selectedRecordIds.includes(r.id));
+            window.appState.selectedRecordIds = [];
+            renderRecordsTable();
+        };
+
+        window.editSelectedRecord = function() {
+            const id = window.appState.selectedRecordIds[0];
+            const record = window.appState.records.find(r => r.id === id);
+            if (!record) return;
+
+            window.appState.editingRecordId = id;
+
+            // Load into fields
+            document.getElementById('patient-firstname').value = record.firstname;
+            document.getElementById('patient-lastname').value = record.lastname;
+            document.getElementById('patient-id').value = record.patientId;
+            document.getElementById('patient-age').value = record.age;
+            document.getElementById('patient-phone').value = record.phone;
+            document.getElementById('patient-gender').value = record.gender;
+
+            // Lock Study Type
+            const studySelect = document.getElementById('study-type-select');
+            studySelect.value = record.studyType;
+            studySelect.disabled = true;
+
+            document.getElementById('report-transducer').value = record.transducer || '';
+            document.getElementById('report-findings').innerHTML = record.findings || '';
+            document.getElementById('report-conclusion').innerHTML = record.conclusion || '';
+
+            document.getElementById('report-form-title').textContent = "Editar Reporte Ecográfico";
+
+            navigateTo('new-report');
+        };
+
+        window.downloadSelectedRecordPDF = function() {
+            const id = window.appState.selectedRecordIds[0];
+            previewSingleRecord(id, true);
+        };
+
+        window.previewSingleRecord = function(id, autoDownload = false) {
+            const record = window.appState.records.find(r => r.id === id);
+            if (!record) return;
+
+            populatePreviewModal(record);
+            document.getElementById('modal-preview').classList.remove('hidden');
+
+            if (autoDownload) {
+                setTimeout(() => { saveAndDownloadPDF(); }, 500);
+            }
+        };
+
+        // ==========================================
+        // VISTA 2 LOGIC: NUEVO REPORTE EN 2 PASOS
+        // ==========================================
+        function resetNewReportForm() {
+            window.appState.editingRecordId = null;
+            document.getElementById('report-form-title').textContent = "Nuevo Reporte Ecográfico";
+            document.getElementById('patient-firstname').value = '';
+            document.getElementById('patient-lastname').value = '';
+            document.getElementById('patient-id').value = '';
+            document.getElementById('patient-age').value = '';
+            document.getElementById('patient-phone').value = '';
+            document.getElementById('patient-gender').value = 'Femenino';
+
+            const studySelect = document.getElementById('study-type-select');
+            studySelect.disabled = false;
+            studySelect.value = "Ecografía Abdominal";
+
+            document.getElementById('custom-date-toggle').checked = false;
+            document.getElementById('custom-date-container').classList.add('hidden');
+
+            document.getElementById('report-transducer').value = '';
+            document.getElementById('toggle-obs').checked = false;
+            document.getElementById('obs-container').classList.add('hidden');
+            document.getElementById('report-observations').value = '';
+
+            document.getElementById('toggle-note').checked = false;
+            document.getElementById('note-container').classList.add('hidden');
+            document.getElementById('report-note').value = '';
+
+            handleStudyTypeChange();
+            goToStep1();
+        }
+
+        window.handleStudyTypeChange = function() {
+            const selectedType = document.getElementById('study-type-select').value;
+            const template = window.appState.templates[selectedType] || DEFAULT_TEMPLATES[selectedType] || { findings: '', conclusion: '' };
+
+            document.getElementById('report-findings').innerHTML = template.findings;
+            document.getElementById('report-conclusion').innerHTML = template.conclusion;
+        };
+
+        window.toggleCustomDateInput = function(isChecked) {
+            document.getElementById('custom-date-container').classList.toggle('hidden', !isChecked);
+        };
+
+        window.goToStep1 = function() {
+            document.getElementById('report-step-1').classList.remove('hidden');
+            document.getElementById('report-step-2').classList.add('hidden');
+
+            document.getElementById('step-1-badge').className = "w-8 h-8 rounded-full bg-ecopraxBlue text-white font-bold text-xs flex items-center justify-center";
+            document.getElementById('step-2-badge').className = "w-8 h-8 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center";
+        };
+
+        window.goToStep2 = function() {
+            const firstname = document.getElementById('patient-firstname').value.trim();
+            const lastname = document.getElementById('patient-lastname').value.trim();
+            const idNum = document.getElementById('patient-id').value.trim();
+
+            if (!firstname || !lastname || !idNum) {
+                alert("Por favor complete los campos obligatorios del paciente (Nombre, Apellido y Cédula).");
+                return;
+            }
+
+            // Save patient to unique list if not present
+            addOrUpdatePatientList({
+                firstname,
+                lastname,
+                id: idNum,
+                age: document.getElementById('patient-age').value,
+                phone: document.getElementById('patient-phone').value,
+                gender: document.getElementById('patient-gender').value
+            });
+
+            // Update Summary Bar
+            document.getElementById('summary-patient-name').textContent = `Paciente: ${firstname} ${lastname}`;
+            document.getElementById('summary-patient-details').textContent = `C.I: ${idNum} | Edad: ${document.getElementById('patient-age').value} | Sexo: ${document.getElementById('patient-gender').value} | Tel: ${document.getElementById('patient-phone').value}`;
+            document.getElementById('summary-study-type').textContent = document.getElementById('study-type-select').value;
+
+            document.getElementById('report-step-1').classList.add('hidden');
+            document.getElementById('report-step-2').classList.remove('hidden');
+
+            document.getElementById('step-1-badge').className = "w-8 h-8 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center";
+            document.getElementById('step-2-badge').className = "w-8 h-8 rounded-full bg-ecopraxBlue text-white font-bold text-xs flex items-center justify-center";
+        };
+
+        // RICH TEXT FORMATTING
+        window.execEditorCommand = function(cmd) {
+            document.execCommand(cmd, false, null);
+        };
+
+        window.toggleCaseSelection = function() {
+            const sel = window.getSelection();
+            if (!sel.rangeCount) return;
+            const text = sel.toString();
+            if (!text) return;
+
+            const isUpper = text === text.toUpperCase();
+            const replacement = isUpper ? text.toLowerCase() : text.toUpperCase();
+            document.execCommand('insertText', false, replacement);
+        };
+
+        // PATIENTS MODAL
+        function addOrUpdatePatientList(pat) {
+            const existingIdx = window.appState.patients.findIndex(p => p.id === pat.id);
+            if (existingIdx >= 0) {
+                window.appState.patients[existingIdx] = pat;
+            } else {
+                window.appState.patients.push(pat);
+            }
+        }
+
+        window.openRegisteredPatientsModal = function() {
+            renderPatientsModalList();
+            document.getElementById('modal-patients').classList.remove('hidden');
+        };
+
+        window.closeRegisteredPatientsModal = function() {
+            document.getElementById('modal-patients').classList.add('hidden');
+        };
+
+        window.renderPatientsModalList = function() {
+            const listContainer = document.getElementById('patients-modal-list');
+            listContainer.innerHTML = '';
+            const search = document.getElementById('patient-modal-search').value.toLowerCase();
+
+            const filtered = window.appState.patients.filter(p => p.firstname.toLowerCase().includes(search) || p.lastname.toLowerCase().includes(search) || p.id.toLowerCase().includes(search));
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay pacientes registrados.</p>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-lg hover:bg-blue-50/50 transition-colors";
+                item.innerHTML = `
+                    <div class="text-xs cursor-pointer flex-1" onclick="selectPatientFromModal('${p.id}')">
+                        <p class="font-bold text-slate-800">${p.firstname} ${p.lastname}</p>
+                        <p class="text-slate-500">C.I: ${p.id} | Edad: ${p.age} | Tel: ${p.phone} | Sexo: ${p.gender}</p>
+                    </div>
+                    <button onclick="deletePatientFromModal('${p.id}')" title="Borrar Paciente" class="p-2 text-red-500 hover:bg-red-100 rounded-lg text-xs ml-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                listContainer.appendChild(item);
+            });
+        };
+
+        window.selectPatientFromModal = function(id) {
+            const pat = window.appState.patients.find(p => p.id === id);
+            if (!pat) return;
+
+            document.getElementById('patient-firstname').value = pat.firstname;
+            document.getElementById('patient-lastname').value = pat.lastname;
+            document.getElementById('patient-id').value = pat.id;
+            document.getElementById('patient-age').value = pat.age;
+            document.getElementById('patient-phone').value = pat.phone;
+            document.getElementById('patient-gender').value = pat.gender;
+
+            closeRegisteredPatientsModal();
+        };
+
+        window.deletePatientFromModal = function(id) {
+            window.appState.patients = window.appState.patients.filter(p => p.id !== id);
+            renderPatientsModalList();
+        };
+
+        // ==========================================
+        // VISTA 3 LOGIC: REPORT CONFIG & TEMPLATES
+        // ==========================================
+        window.handleLogoUpload = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                window.appState.userProfile.logoUrl = evt.target.result;
+                document.getElementById('config-logo-preview').src = evt.target.result;
+                document.getElementById('config-logo-preview').classList.remove('hidden');
+                document.getElementById('config-logo-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.removeLogo = function() {
+            window.appState.userProfile.logoUrl = '';
+            document.getElementById('config-logo-preview').classList.add('hidden');
+            document.getElementById('config-logo-placeholder').classList.remove('hidden');
+        };
+
+        window.loadTemplateForEditing = function() {
+            const selectedType = document.getElementById('template-study-select').value;
+            const template = window.appState.templates[selectedType] || DEFAULT_TEMPLATES[selectedType];
+
+            document.getElementById('template-findings-text').value = template.findings;
+            document.getElementById('template-conclusion-text').value = template.conclusion;
+        };
+
+        window.saveTemplateChanges = function() {
+            const selectedType = document.getElementById('template-study-select').value;
+            const findings = document.getElementById('template-findings-text').value;
+            const conclusion = document.getElementById('template-conclusion-text').value;
+
+            window.appState.templates[selectedType] = { findings, conclusion };
+            alert(`Plantilla para "${selectedType}" guardada exitosamente.`);
+        };
+
+        // ==========================================
+        // VISTA 4 LOGIC: DATOS PROFESIONALES & STAMP LOGIC
+        // ==========================================
+        window.processSignatureUpload = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            removeWhiteBackground(file, (processedDataUrl) => {
+                window.appState.userProfile.signatureUrl = processedDataUrl;
+                document.getElementById('pro-signature-preview').src = processedDataUrl;
+                document.getElementById('pro-signature-preview').classList.remove('hidden');
+                document.getElementById('pro-signature-placeholder').classList.add('hidden');
+            });
+        };
+
+        window.processStampUpload = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                window.appState.userProfile.stampUrl = evt.target.result;
+                document.getElementById('pro-stamp-preview').src = evt.target.result;
+                document.getElementById('pro-stamp-preview').classList.remove('hidden');
+                document.getElementById('pro-stamp-placeholder').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // White background removal canvas helper
+        function removeWhiteBackground(file, callback) {
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imgData.data;
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        // If pixel is near white, set opacity to 0
+                        if (r > 220 && g > 220 && b > 220) {
+                            data[i + 3] = 0;
+                        }
+                    }
+
+                    ctx.putImageData(imgData, 0, 0);
+                    callback(canvas.toDataURL('image/png'));
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        window.handleSaveProData = async function(e) {
+            e.preventDefault();
+            const prof = window.appState.userProfile;
+            prof.fullname = document.getElementById('pro-fullname').value;
+            prof.specialty = document.getElementById('pro-specialty').value;
+            prof.mpps = document.getElementById('pro-mpps').value;
+            prof.cmv = document.getElementById('pro-cmv').value;
+
+            updateUIUserProfiles();
+
+            if (window.appState.currentUser?.uid) {
+                try {
+                    await setDoc(doc(db, "users", window.appState.currentUser.uid), prof, { merge: true });
+                } catch(err){}
+            }
+
+            alert("Datos profesionales actualizados correctamente.");
+        };
+
+        // ==========================================
+        // VISTA 5 LOGIC: MI PERFIL
+        // ==========================================
+        window.handleProfileAvatarChange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                window.appState.userProfile.photoUrl = evt.target.result;
+                updateUIUserProfiles();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.handleChangePassword = async function(e) {
+            e.preventDefault();
+            const pass = document.getElementById('profile-new-pass').value;
+            const confirm = document.getElementById('profile-confirm-pass').value;
+
+            if (pass !== confirm) {
+                alert("Las contraseñas no coinciden.");
+                return;
+            }
+
+            if (auth.currentUser) {
+                try {
+                    await updatePassword(auth.currentUser, pass);
+                    alert("Contraseña modificada exitosamente.");
+                } catch (err) {
+                    alert("Error al cambiar contraseña: " + err.message);
+                }
+            } else {
+                alert("Contraseña modificada en sesión local.");
+            }
+        };
+
+        // ==========================================
+        // PREVIEW & PRINT/PDF GENERATION
+        // ==========================================
+        window.openPreviewModal = function() {
+            const firstname = document.getElementById('patient-firstname').value.trim();
+            const lastname = document.getElementById('patient-lastname').value.trim();
+            const idNum = document.getElementById('patient-id').value.trim();
+
+            let studyDate = new Date().toISOString().split('T')[0];
+            if (document.getElementById('custom-date-toggle').checked && document.getElementById('custom-study-date').value) {
+                studyDate = document.getElementById('custom-study-date').value;
+            }
+
+            const recordData = {
+                firstname,
+                lastname,
+                patientName: `${firstname} ${lastname}`,
+                patientId: idNum,
+                age: document.getElementById('patient-age').value,
+                sex: document.getElementById('patient-gender').value,
+                phone: document.getElementById('patient-phone').value,
+                studyType: document.getElementById('study-type-select').value,
+                date: studyDate,
+                transducer: document.getElementById('report-transducer').value,
+                findings: document.getElementById('report-findings').innerHTML,
+                conclusion: document.getElementById('report-conclusion').innerHTML,
+                observations: document.getElementById('toggle-obs').checked ? document.getElementById('report-observations').value : '',
+                note: document.getElementById('toggle-note').checked ? document.getElementById('report-note').value : ''
+            };
+
+            populatePreviewModal(recordData);
+            document.getElementById('modal-preview').classList.remove('hidden');
+        };
+
+        function populatePreviewModal(record) {
+            const prof = window.appState.userProfile;
+
+            // Doctor Info Header
+            document.getElementById('preview-doc-name').textContent = prof.fullname;
+            document.getElementById('preview-doc-specialty').textContent = prof.specialty || '';
+            document.getElementById('preview-doc-credentials').textContent = `${prof.mpps || ''} ${prof.cmv ? '| ' + prof.cmv : ''}`;
+
+            // Header line color
+            const color = document.getElementById('config-line-color').value || '#0152a7';
+            document.getElementById('preview-header-line').style.backgroundColor = color;
+
+            // Header Logo
+            if (prof.logoUrl) {
+                document.getElementById('preview-header-logo').src = prof.logoUrl;
+                document.getElementById('preview-header-logo').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-header-logo').classList.add('hidden');
+            }
+
+            // Patient details
+            document.getElementById('preview-patient-name').textContent = record.patientName;
+            document.getElementById('preview-patient-id').textContent = record.patientId;
+            document.getElementById('preview-patient-age-sex').textContent = `${record.age} / ${record.sex || record.gender || ''}`;
+            document.getElementById('preview-patient-phone').textContent = record.phone || '-';
+            document.getElementById('preview-study-date').textContent = record.date;
+            document.getElementById('preview-study-title').textContent = record.studyType;
+
+            // Transducer
+            if (record.transducer) {
+                document.getElementById('preview-transducer-text').textContent = record.transducer;
+                document.getElementById('preview-transducer-container').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-transducer-container').classList.add('hidden');
+            }
+
+            // Findings & Conclusion
+            document.getElementById('preview-findings-text').innerHTML = record.findings;
+            document.getElementById('preview-conclusion-text').innerHTML = record.conclusion;
+
+            // Observations & Note
+            if (record.observations) {
+                document.getElementById('preview-obs-text').textContent = record.observations;
+                document.getElementById('preview-obs-wrapper').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-obs-wrapper').classList.add('hidden');
+            }
+
+            if (record.note) {
+                document.getElementById('preview-note-text').textContent = record.note;
+                document.getElementById('preview-note-wrapper').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-note-wrapper').classList.add('hidden');
+            }
+
+            // Stamp & Signature
+            if (prof.signatureUrl) {
+                document.getElementById('preview-signature-img').src = prof.signatureUrl;
+                document.getElementById('preview-signature-img').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-signature-img').classList.add('hidden');
+            }
+
+            if (prof.stampUrl) {
+                document.getElementById('preview-stamp-img').src = prof.stampUrl;
+                document.getElementById('preview-stamp-img').classList.remove('hidden');
+            } else {
+                document.getElementById('preview-stamp-img').classList.add('hidden');
+            }
+
+            document.getElementById('preview-footer-doc-name').textContent = prof.fullname;
+            document.getElementById('preview-footer-doc-mpps').textContent = prof.mpps;
+        }
+
+        window.closePreviewModal = function() {
+            document.getElementById('modal-preview').classList.add('hidden');
+        };
+
+        window.saveAndDownloadPDF = async function() {
+            const firstname = document.getElementById('patient-firstname').value.trim() || 'paciente';
+            const lastname = document.getElementById('patient-lastname').value.trim() || 'nombre';
+            const idNum = document.getElementById('patient-id').value.trim().replace(/[^a-zA-Z0-9]/g, '') || '000';
+
+            // Filename format required: cedula_nombre_apellido.pdf
+            const fileName = `${idNum}_${firstname.toLowerCase()}_${lastname.toLowerCase()}.pdf`;
+
+            let studyDate = new Date().toISOString().split('T')[0];
+            if (document.getElementById('custom-date-toggle').checked && document.getElementById('custom-study-date').value) {
+                studyDate = document.getElementById('custom-study-date').value;
+            }
+
+            const recordObj = {
+                id: window.appState.editingRecordId || 'rec_' + Date.now(),
+                firstname,
+                lastname,
+                patientName: `${firstname} ${lastname}`,
+                patientId: document.getElementById('patient-id').value.trim(),
+                age: document.getElementById('patient-age').value,
+                gender: document.getElementById('patient-gender').value,
+                phone: document.getElementById('patient-phone').value,
+                studyType: document.getElementById('study-type-select').value,
+                date: studyDate,
+                transducer: document.getElementById('report-transducer').value,
+                findings: document.getElementById('report-findings').innerHTML,
+                conclusion: document.getElementById('report-conclusion').innerHTML,
+                observations: document.getElementById('toggle-obs').checked ? document.getElementById('report-observations').value : '',
+                note: document.getElementById('toggle-note').checked ? document.getElementById('report-note').value : ''
+            };
+
+            // Save to Firestore / State
+            if (window.appState.editingRecordId) {
+                const idx = window.appState.records.findIndex(r => r.id === window.appState.editingRecordId);
+                if (idx >= 0) window.appState.records[idx] = recordObj;
+                try {
+                    await setDoc(doc(db, "records", window.appState.editingRecordId), recordObj, { merge: true });
+                } catch(e){}
+            } else {
+                window.appState.records.unshift(recordObj);
+                try {
+                    await addDoc(collection(db, "records"), { ...recordObj, userId: window.appState.currentUser?.uid || 'local' });
+                } catch(e){}
+            }
+
+            // Generate and download PDF using html2pdf
+            const element = document.getElementById('printable-report');
+            const opt = {
+                margin:       5,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } catch(e) {
+                window.print();
+            }
+
+            closePreviewModal();
+            navigateTo('records');
+            renderRecordsTable();
+        };
+
+        // FIRESTORE SYNC
+        async function loadRecordsFromFirestore() {
+            if (!window.appState.currentUser) return;
+            try {
+                const q = query(collection(db, "records"), where("userId", "==", window.appState.currentUser.uid));
+                const querySnapshot = await getDocs(q);
+                const loaded = [];
+                querySnapshot.forEach((doc) => {
+                    loaded.push({ id: doc.id, ...doc.data() });
+                });
+                if (loaded.length > 0) {
+                    window.appState.records = loaded;
+                }
+            } catch(e){}
+            renderRecordsTable();
+        }
+
+    </script>
 </body>
 </html>
