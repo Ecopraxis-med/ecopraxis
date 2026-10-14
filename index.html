@@ -192,10 +192,10 @@
           </button>
           
           <!-- NUEVO REPORTE -->
-          <button onclick="iniciarNuevoReporteForm()" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
-            <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-            <span>Nuevo Reporte</span>
-          </button>
+<button id="btn-nav-nuevo-reporte" onclick="iniciarNuevoReporteForm(this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
+  <svg class="w-4 h-4 stroke-current" fill="none" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+  <span>Nuevo Reporte</span>
+</button>
 
           <!-- CONFIG REPORTE -->
           <button onclick="cambiarVista('vista-config-reporte', this)" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition text-slate-300 hover:bg-white/5 hover:text-white cursor-pointer">
@@ -839,37 +839,39 @@
       }
     }
 
-    window.iniciarNuevoReporteForm = function() {
-      examenEditandoId = null;
-      document.getElementById('pac-nombre').value = "";
-      document.getElementById('pac-apellido').value = "";
-      document.getElementById('pac-cedula').value = "";
-      document.getElementById('pac-edad').value = "";
-      document.getElementById('pac-telefono').value = "";
-      document.getElementById('pac-sexo').selectedIndex = 0;
-      
-      const selectEstudio = document.getElementById('pac-estudio');
-      selectEstudio.disabled = false;
-      selectEstudio.selectedIndex = 0;
+    window.iniciarNuevoReporteForm = function(btnElem) {
+  examenEditandoId = null;
+  document.getElementById('pac-nombre').value = "";
+  document.getElementById('pac-apellido').value = "";
+  document.getElementById('pac-cedula').value = "";
+  document.getElementById('pac-edad').value = "";
+  document.getElementById('pac-telefono').value = "";
+  document.getElementById('pac-sexo').selectedIndex = 0;
+  
+  const selectEstudio = document.getElementById('pac-estudio');
+  selectEstudio.disabled = false;
+  selectEstudio.selectedIndex = 0;
 
-      document.getElementById('check-fecha-manual').checked = false;
-      document.getElementById('container-fecha-manual').classList.add('hidden');
-      document.getElementById('pac-fecha-manual').value = "";
+  document.getElementById('check-fecha-manual').checked = false;
+  document.getElementById('container-fecha-manual').classList.add('hidden');
+  document.getElementById('pac-fecha-manual').value = "";
 
-      aplicarPlantillaEstudioEnReporte("Ecografía Abdominal");
+  aplicarPlantillaEstudioEnReporte("Ecografía Abdominal");
 
-      document.getElementById('check-observaciones').checked = false;
-      document.getElementById('sec-observaciones').classList.add('hidden');
-      document.getElementById('texto-observaciones').value = "";
-      document.getElementById('check-nota').checked = false;
-      document.getElementById('sec-nota').classList.add('hidden');
-      document.getElementById('texto-nota').value = "";
+  document.getElementById('check-observaciones').checked = false;
+  document.getElementById('sec-observaciones').classList.add('hidden');
+  document.getElementById('texto-observaciones').value = "";
+  document.getElementById('check-nota').checked = false;
+  document.getElementById('sec-nota').classList.add('hidden');
+  document.getElementById('texto-nota').value = "";
 
-      document.getElementById('paso-clinico').classList.add('hidden');
-      document.getElementById('paso-paciente').classList.remove('hidden');
+  document.getElementById('paso-clinico').classList.add('hidden');
+  document.getElementById('paso-paciente').classList.remove('hidden');
 
-      cambiarVista('vista-nuevo-reporte');
-    }
+  // Si no se pasó el elemento directamente (por ejemplo al editar un registro), buscamos el botón por ID
+  const elBtn = btnElem || document.getElementById('btn-nav-nuevo-reporte');
+  cambiarVista('vista-nuevo-reporte', elBtn);
+}
 
     window.actualizarPlantillasAlCambiarEstudio = function() {
       if (examenEditandoId !== null) return;
