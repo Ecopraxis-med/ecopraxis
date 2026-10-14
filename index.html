@@ -595,104 +595,95 @@
     </div>
   </div>
 
-  <!-- MODAL DE VISTA PREVIA Y ACCIONES DE INFORME -->
-  <div id="modal-preview" class="hidden fixed inset-0 bg-slate-900/70 z-50 overflow-y-auto p-4 md:p-10 flex justify-center items-start">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative my-6">
-      <div class="flex justify-between items-center pb-4 mb-6 border-b">
-        <span class="text-xs font-bold text-slate-500 uppercase">Vista Previa de Informe</span>
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="window.print()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg">🖨️ Imprimir</button>
-          <button onclick="guardarYGenerarPDF()" class="bg-ecopraxBlue hover:bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg">📥 Guardar y Descargar PDF</button>
-          <button onclick="cerrarVistaPreviaModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-lg">✕ Cerrar</button>
-        </div>
-      </div>
-
-      <div id="planilla-imprimible">
-       <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
-<div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
-  
-  <!-- CASO A: SI TIENE LOGO INSTITUCIONAL (LOGO IZQUIERDA / MEMBRETE CENTRADO) -->
-  <div id="pdf-header-institucional" class="hidden w-full flex items-center justify-between gap-4">
-    <!-- Logo Institucional a la Izquierda -->
-    <div class="w-1/4 flex justify-start">
-      <img id="pdf-img-institucion" src="" class="h-16 object-contain" alt="Logo Institución">
+  <!-- MODAL DE VISTA PREVIA Y ACCIONES DE INFORME (ESTILO HOJA CARTA CON MARGEN DE 1 CM) -->
+  <div id="modal-preview" class="hidden fixed inset-0 bg-slate-950/80 z-50 overflow-y-auto p-0 md:p-6 flex justify-center items-start">
+    
+    <!-- CONTENEDOR PRINCIPAL FLOTANTE DE BOTONES -->
+    <div class="fixed top-4 right-4 z-50 flex gap-2" id="modal-action-buttons">
+      <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-1.5">🖨️ Imprimir</button>
+      <button onclick="guardarYGenerarPDF()" class="bg-ecopraxBlue hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition flex items-center gap-1.5">📥 Guardar y Descargar PDF</button>
+      <button onclick="cerrarVistaPreviaModal()" class="bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition border">✕ Cerrar</button>
     </div>
 
-    <!-- Membrete Multilíneas Centrado -->
-    <div class="w-2/4 text-center space-y-1">
-      <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-800 whitespace-pre-line font-arial leading-tight"></div>
-      <div class="text-[10px] text-slate-600 font-arial pt-1 border-t border-slate-200 mt-1 inline-block px-2">
-        <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
-      </div>
-    </div>
-
-    <!-- Espacio de balance o datos secundarios a la derecha -->
-    <div class="w-1/4 text-right text-[10px] text-slate-500 font-arial">
-      <!-- Reservado para equilibrar la cabecera -->
-    </div>
-  </div>
-
-  <!-- CASO B: ENCABEZADO ESTÁNDAR DE ECOPRAXIS -->
-  <div id="pdf-header-standard" class="flex justify-between items-center">
-    <div class="flex items-center gap-3">
-      <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
-      <div>
-        <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
-        <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
-      </div>
-    </div>
-    <div class="text-right text-xs">
-      <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
-      <p class="text-slate-500" id="pdf-medico-mpps"></p>
-      <p class="text-slate-500" id="pdf-medico-cmv"></p>
-    </div>
-  </div>
-
-</div>
-
-        <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-4 font-arial">
-          <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
-          <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
-          <p><strong>Edad / Sexo:</strong> <span id="pdf-edad-sexo"></span></p>
-          <p><strong>Teléfono:</strong> <span id="pdf-telefono"></span></p>
-          <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
-          <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
-        </div>
-
-        <!-- TRANSDUCTOR Y VÍA -->
-        <div id="pdf-container-transductor" class="mb-4 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border font-arial">
-          <div id="pdf-transductor"></div>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
-          <div id="pdf-hallazgos" class="text-xs leading-relaxed text-slate-700 font-arial"></div>
-        </div>
-
-        <div id="pdf-container-obs" class="mb-4 hidden">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Observaciones</h3>
-          <p id="pdf-observaciones" class="text-xs text-slate-700 font-arial"></p>
-        </div>
-
-        <div class="mb-4">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
-          <div id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-arial"></div>
-        </div>
-
-        <div id="pdf-container-nota" class="mb-6 hidden">
-          <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Nota</h3>
-          <p id="pdf-nota" class="text-xs italic text-slate-600 font-arial"></p>
-        </div>
-
-        <div class="flex justify-between items-end mt-12 pt-4">
-          <div class="text-center w-40">
-            <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
-            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
+    <!-- HOJA TIPO CARTA REAL CON MARGEN DE 1 CM (aprox 40px / p-10) -->
+    <div class="bg-white w-full max-w-3xl min-h-[1056px] p-[40px] my-4 md:my-8 shadow-2xl relative text-slate-800 font-arial" id="planilla-imprimible">
+      
+      <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
+      <div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
+        
+        <!-- CASO A: LOGO IZQUIERDA Y MEMBRETE CENTRADO -->
+        <div id="pdf-header-institucional" class="hidden relative flex items-center min-h-[60px]">
+          <div class="absolute left-0">
+            <img id="pdf-img-institucion" src="" class="h-14 object-contain" alt="Logo Institución">
           </div>
-          <div class="text-center w-40">
-            <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden object-contain" alt="Firma">
-            <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
+          <div class="w-full text-center px-16 space-y-1">
+            <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-900 whitespace-pre-line font-arial leading-tight"></div>
+            <div class="text-[10px] text-slate-600 font-arial pt-1 border-t border-slate-200 mt-1 inline-block px-2">
+              <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
+            </div>
           </div>
+        </div>
+
+        <!-- CASO B: ENCABEZADO ESTÁNDAR DE ECOPRAXIS -->
+        <div id="pdf-header-standard" class="flex justify-between items-center">
+          <div class="flex items-center gap-3">
+            <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
+            <div>
+              <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
+              <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
+            </div>
+          </div>
+          <div class="text-right text-xs">
+            <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
+            <p class="text-slate-500" id="pdf-medico-mpps"></p>
+            <p class="text-slate-500" id="pdf-medico-cmv"></p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-4 font-arial">
+        <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
+        <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
+        <p><strong>Edad / Sexo:</strong> <span id="pdf-edad-sexo"></span></p>
+        <p><strong>Teléfono:</strong> <span id="pdf-telefono"></span></p>
+        <p><strong>Fecha:</strong> <span id="pdf-fecha"></span></p>
+        <p class="col-span-2"><strong>Estudio:</strong> <span id="pdf-estudio"></span></p>
+      </div>
+
+      <!-- TRANSDUCTOR Y VÍA -->
+      <div id="pdf-container-transductor" class="mb-4 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border font-arial">
+        <div id="pdf-transductor"></div>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
+        <div id="pdf-hallazgos" class="text-xs leading-relaxed text-slate-700 font-arial"></div>
+      </div>
+
+      <div id="pdf-container-obs" class="mb-4 hidden">
+        <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Observaciones</h3>
+        <p id="pdf-observaciones" class="text-xs text-slate-700 font-arial"></p>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
+        <div id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-arial"></div>
+      </div>
+
+      <div id="pdf-container-nota" class="mb-6 hidden">
+        <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Nota</h3>
+        <p id="pdf-nota" class="text-xs italic text-slate-600 font-arial"></p>
+      </div>
+
+      <div class="flex justify-between items-end mt-12 pt-4">
+        <div class="text-center w-40">
+          <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
+          <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Sello Profesional</div>
+        </div>
+        <div class="text-center w-40">
+          <img id="pdf-img-firma" src="" class="max-h-16 mx-auto mb-1 hidden object-contain" alt="Firma">
+          <div class="border-t border-slate-400 pt-1 text-[10px] font-bold text-slate-600">Firma Autorizada</div>
         </div>
       </div>
     </div>
@@ -702,8 +693,9 @@
     @media print {
       body * { visibility: hidden; }
       #modal-preview, #modal-preview * { visibility: visible; }
-      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; }
-      #modal-preview button { display: none !important; }
+      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; padding: 0 !important; }
+      #modal-action-buttons { display: none !important; }
+      #planilla-imprimible { box-shadow: none !important; margin: 0 !important; width: 100% !important; padding: 20px !important; }
     }
   </style>
 
@@ -744,7 +736,6 @@
       }
     };
 
-    // MENÚ MÓVIL
     const btnMobile = document.getElementById('btn-toggle-mobile-menu');
     const sidebar = document.getElementById('sidebar-container');
     const overlay = document.getElementById('mobile-overlay');
@@ -851,7 +842,6 @@
       document.getElementById('paso-paciente').classList.remove('hidden');
     }
 
-    // GESTIÓN DE PLANTILLAS Y MEMBRETE EN CONFIGURACIÓN
     window.cargarPlantillaEnEditorConfig = function() {
       const estudio = document.getElementById('config-select-estudio').value;
       const plantillasGuardadas = medicoActualDatos.plantillasEstudios || {};
@@ -916,7 +906,6 @@
       });
     }
 
-    // PACIENTES Y REGISTROS
     window.abrirModalPacientesRegistrados = function() {
       document.getElementById('modal-pacientes').classList.remove('hidden');
       renderizarListaPacientesModal(examenesListaGlobal);
@@ -1200,32 +1189,24 @@
       const colorLinea = medicoActualDatos.colorLinea || '#042050';
       document.getElementById('pdf-header-container').style.borderColor = colorLinea;
 
-      // VALIDAR LOGO INSTITUCIONAL Y MEMBRETE (LOGO IZQUIERDA / MEMBRETE CENTRADO)
       const headerInst = document.getElementById('pdf-header-institucional');
       const headerStandard = document.getElementById('pdf-header-standard');
       const imgInst = document.getElementById('pdf-img-institucion');
 
-      // Dentro de la función poblarVistaPreviaModal(item)
+      if (medicoActualDatos.logoInstUrl) {
+        headerInst.classList.remove('hidden');
+        headerStandard.classList.add('hidden');
+        imgInst.src = medicoActualDatos.logoInstUrl;
+        imgInst.classList.remove('hidden');
 
-if (medicoActualDatos.logoInstUrl) {
-  headerInst.classList.remove('hidden');
-  headerStandard.classList.add('hidden');
-  imgInst.src = medicoActualDatos.logoInstUrl;
-  imgInst.classList.remove('hidden');
+        document.getElementById('pdf-membrete-texto').innerText = medicoActualDatos.membreteTexto || '';
+        document.getElementById('pdf-medico-nombre-inst').innerText = medicoActualDatos.nombre || 'Dr.';
+        document.getElementById('pdf-medico-mpps-inst').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
+        document.getElementById('pdf-medico-cmv-inst').innerText = (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) ? `| CMV: ${medicoActualDatos.cmv}` : '';
+      } else {
+        headerInst.classList.add('hidden');
+        headerStandard.classList.remove('hidden');
 
-  // Asigna el texto del membrete respetando saltos de línea
-  const membreteElem = document.getElementById('pdf-membrete-texto');
-  if (membreteElem) {
-    membreteElem.innerText = medicoActualDatos.membreteTexto || '';
-  }
-
-  document.getElementById('pdf-medico-nombre-inst').innerText = medicoActualDatos.nombre || 'Dr.';
-  document.getElementById('pdf-medico-mpps-inst').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
-  document.getElementById('pdf-medico-cmv-inst').innerText = (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) ? `| CMV: ${medicoActualDatos.cmv}` : '';
-} else {
-  headerInst.classList.add('hidden');
-  headerStandard.classList.remove('hidden');
-  
         document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr.';
         document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
         if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
@@ -1296,9 +1277,11 @@ if (medicoActualDatos.logoInstUrl) {
         cargarRegistros(user.uid);
       }
 
-      const nombreLimpioNom = nom.toLowerCase().replace(/\s+/g, '_');
-      const nombreLimpioApe = ape.toLowerCase().replace(/\s+/g, '_');
-      const nombreArchivo = `${ced}_${nombreLimpioNom}_${nombreLimpioApe}.pdf`;
+      // Nombre del archivo PDF exacto: NOMBRE_APELLIDO_CEDULA.pdf (en mayúsculas/minúsculas limpias)
+      const nombreLimpioNom = nom.toUpperCase().replace(/\s+/g, '_');
+      const nombreLimpioApe = ape.toUpperCase().replace(/\s+/g, '_');
+      const cedulaLimpia = ced.replace(/[^a-zA-Z0-9]/g, '');
+      const nombreArchivo = `${nombreLimpioNom}_${nombreLimpioApe}_${cedulaLimpia}.pdf`;
 
       const originalTitle = document.title;
       document.title = nombreArchivo;
@@ -1399,7 +1382,6 @@ if (medicoActualDatos.logoInstUrl) {
       selectElem.selectedIndex = 0;
     }
 
-    // AUTH & SETUP
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('link-to-register')?.addEventListener('click', () => {
         document.getElementById('form-login-container').classList.add('hidden');
