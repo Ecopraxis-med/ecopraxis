@@ -1226,8 +1226,6 @@ if (medicoActualDatos.logoInstUrl) {
   headerInst.classList.add('hidden');
   headerStandard.classList.remove('hidden');
   
-  // ... resto del código estándar
-}
         document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr.';
         document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
         if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
