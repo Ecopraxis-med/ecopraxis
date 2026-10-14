@@ -412,7 +412,7 @@
           <!-- CABECERA INSTITUCIONAL Y MEMBRETE MULTILÍNEAS -->
           <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
             <h3 class="text-xs font-bold uppercase text-ecopraxDark">Cabecera y Membrete Institucional (Opcional)</h3>
-            <p class="text-[11px] text-slate-500">Si configuras un logo institucional, el membrete y el logo reemplazarán por completo al encabezado predeterminado de Ecopraxis en el informe.</p>
+            <p class="text-[11px] text-slate-500">Si configuras un logo institucional, el logo aparecerá a la izquierda y el membrete centrado, reemplazando el encabezado de Ecopraxis.</p>
             
             <div class="flex items-center gap-4">
               <div>
@@ -608,15 +608,19 @@
       </div>
 
       <div id="planilla-imprimible">
-        <!-- CABECERA INSTITUCIONAL O ESTÁNDAR (CENTRADA SI HAY LOGO INSTITUCIONAL) -->
+        <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
         <div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
           
-          <!-- CASO A: SI TIENE LOGO INSTITUCIONAL (TODO CENTRADO Y OCULTA ECOPRAXIS) -->
-          <div id="pdf-header-institucional" class="hidden text-center space-y-2">
-            <img id="pdf-img-institucion" src="" class="h-14 mx-auto object-contain" alt="Logo Institución">
-            <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-800 whitespace-pre-line font-arial"></div>
-            <div class="text-[11px] text-slate-600 font-arial pt-1 border-t border-slate-200">
-              <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
+          <!-- CASO A: LOGO A LA IZQUIERDA Y MEMBRETE CENTRADO -->
+          <div id="pdf-header-institucional" class="hidden relative flex items-center">
+            <div class="absolute left-0">
+              <img id="pdf-img-institucion" src="" class="h-14 object-contain" alt="Logo Institución">
+            </div>
+            <div class="w-full text-center px-16 space-y-1">
+              <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-800 whitespace-pre-line font-arial"></div>
+              <div class="text-[11px] text-slate-600 font-arial pt-1 border-t border-slate-200 inline-block px-4">
+                <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
+              </div>
             </div>
           </div>
 
@@ -1188,7 +1192,7 @@
       const colorLinea = medicoActualDatos.colorLinea || '#042050';
       document.getElementById('pdf-header-container').style.borderColor = colorLinea;
 
-      // VALIDAR SI TIENE LOGO INSTITUCIONAL
+      // VALIDAR LOGO INSTITUCIONAL Y MEMBRETE (LOGO IZQUIERDA / MEMBRETE CENTRADO)
       const headerInst = document.getElementById('pdf-header-institucional');
       const headerStandard = document.getElementById('pdf-header-standard');
       const imgInst = document.getElementById('pdf-img-institucion');
