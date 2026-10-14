@@ -608,39 +608,47 @@
       </div>
 
       <div id="planilla-imprimible">
-        <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
-        <div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
-          
-          <!-- CASO A: LOGO A LA IZQUIERDA Y MEMBRETE CENTRADO -->
-          <div id="pdf-header-institucional" class="hidden relative flex items-center">
-            <div class="absolute left-0">
-              <img id="pdf-img-institucion" src="" class="h-14 object-contain" alt="Logo Institución">
-            </div>
-            <div class="w-full text-center px-16 space-y-1">
-              <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-800 whitespace-pre-line font-arial"></div>
-              <div class="text-[11px] text-slate-600 font-arial pt-1 border-t border-slate-200 inline-block px-4">
-                <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
-              </div>
-            </div>
-          </div>
+       <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
+<div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
+  
+  <!-- CASO A: SI TIENE LOGO INSTITUCIONAL (LOGO IZQUIERDA / MEMBRETE CENTRADO) -->
+  <div id="pdf-header-institucional" class="hidden w-full flex items-center justify-between gap-4">
+    <!-- Logo Institucional a la Izquierda -->
+    <div class="w-1/4 flex justify-start">
+      <img id="pdf-img-institucion" src="" class="h-16 object-contain" alt="Logo Institución">
+    </div>
 
-          <!-- CASO B: ENCABEZADO ESTÁNDAR DE ECOPRAXIS -->
-          <div id="pdf-header-standard" class="flex justify-between items-center">
-            <div class="flex items-center gap-3">
-              <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
-              <div>
-                <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
-                <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
-              </div>
-            </div>
-            <div class="text-right text-xs">
-              <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
-              <p class="text-slate-500" id="pdf-medico-mpps"></p>
-              <p class="text-slate-500" id="pdf-medico-cmv"></p>
-            </div>
-          </div>
+    <!-- Membrete Multilíneas Centrado -->
+    <div class="w-2/4 text-center space-y-1">
+      <div id="pdf-membrete-texto" class="text-xs font-bold text-slate-800 whitespace-pre-line font-arial leading-tight"></div>
+      <div class="text-[10px] text-slate-600 font-arial pt-1 border-t border-slate-200 mt-1 inline-block px-2">
+        <span class="font-bold" id="pdf-medico-nombre-inst"></span> | <span id="pdf-medico-mpps-inst"></span> <span id="pdf-medico-cmv-inst"></span>
+      </div>
+    </div>
 
-        </div>
+    <!-- Espacio de balance o datos secundarios a la derecha -->
+    <div class="w-1/4 text-right text-[10px] text-slate-500 font-arial">
+      <!-- Reservado para equilibrar la cabecera -->
+    </div>
+  </div>
+
+  <!-- CASO B: ENCABEZADO ESTÁNDAR DE ECOPRAXIS -->
+  <div id="pdf-header-standard" class="flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <img src="https://ecopraxis-med.github.io/ecopraxis/ECOPRAXIS_ISOTIPO_POSITIVO.png" class="w-8 h-8 object-contain" alt="Logo">
+      <div>
+        <h1 class="text-xl font-black"><span style="color: #042050;">ECO</span><span style="color: #0152a7;">PRAXIS</span></h1>
+        <p class="text-[9px] text-slate-500 uppercase tracking-widest">Servicio de Ecografía Clínica</p>
+      </div>
+    </div>
+    <div class="text-right text-xs">
+      <p class="font-bold text-ecopraxDark" id="pdf-medico-nombre"></p>
+      <p class="text-slate-500" id="pdf-medico-mpps"></p>
+      <p class="text-slate-500" id="pdf-medico-cmv"></p>
+    </div>
+  </div>
+
+</div>
 
         <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-4 font-arial">
           <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
@@ -1197,20 +1205,29 @@
       const headerStandard = document.getElementById('pdf-header-standard');
       const imgInst = document.getElementById('pdf-img-institucion');
 
-      if (medicoActualDatos.logoInstUrl) {
-        headerInst.classList.remove('hidden');
-        headerStandard.classList.add('hidden');
-        imgInst.src = medicoActualDatos.logoInstUrl;
-        imgInst.classList.remove('hidden');
+      // Dentro de la función poblarVistaPreviaModal(item)
 
-        document.getElementById('pdf-membrete-texto').innerText = medicoActualDatos.membreteTexto || '';
-        document.getElementById('pdf-medico-nombre-inst').innerText = medicoActualDatos.nombre || 'Dr.';
-        document.getElementById('pdf-medico-mpps-inst').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
-        document.getElementById('pdf-medico-cmv-inst').innerText = (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) ? `| CMV: ${medicoActualDatos.cmv}` : '';
-      } else {
-        headerInst.classList.add('hidden');
-        headerStandard.classList.remove('hidden');
+if (medicoActualDatos.logoInstUrl) {
+  headerInst.classList.remove('hidden');
+  headerStandard.classList.add('hidden');
+  imgInst.src = medicoActualDatos.logoInstUrl;
+  imgInst.classList.remove('hidden');
 
+  // Asigna el texto del membrete respetando saltos de línea
+  const membreteElem = document.getElementById('pdf-membrete-texto');
+  if (membreteElem) {
+    membreteElem.innerText = medicoActualDatos.membreteTexto || '';
+  }
+
+  document.getElementById('pdf-medico-nombre-inst').innerText = medicoActualDatos.nombre || 'Dr.';
+  document.getElementById('pdf-medico-mpps-inst').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
+  document.getElementById('pdf-medico-cmv-inst').innerText = (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) ? `| CMV: ${medicoActualDatos.cmv}` : '';
+} else {
+  headerInst.classList.add('hidden');
+  headerStandard.classList.remove('hidden');
+  
+  // ... resto del código estándar
+}
         document.getElementById('pdf-medico-nombre').innerText = medicoActualDatos.nombre || 'Dr.';
         document.getElementById('pdf-medico-mpps').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
         if (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) {
