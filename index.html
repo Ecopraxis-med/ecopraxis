@@ -28,6 +28,43 @@
     .editor-clinico ul { list-style-type: disc !important; margin-left: 1.5rem !important; }
     .editor-clinico ol { list-style-type: decimal !important; margin-left: 1.5rem !important; }
     .font-arial { font-family: Arial, Helvetica, sans-serif; }
+
+    /* REGLAS ESTRICTAS PARA IMPRESIÓN Y PDF SIN BARRAS DE DESPLAZAMIENTO */
+    @media print {
+      html, body {
+        overflow: hidden !important;
+        height: auto !important;
+        background: white !important;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #modal-preview, #modal-preview * {
+        visibility: visible;
+      }
+      #modal-preview {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+      }
+      #modal-action-buttons {
+        display: none !important;
+      }
+      #planilla-imprimible {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+        padding: 20px !important;
+        overflow: hidden !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen">
@@ -595,7 +632,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE VISTA PREVIA Y ACCIONES DE INFORME (ESTILO HOJA CARTA CON MARGEN DE 1 CM) -->
+  <!-- MODAL DE VISTA PREVIA Y ACCIONES DE INFORME -->
   <div id="modal-preview" class="hidden fixed inset-0 bg-slate-950/80 z-50 overflow-y-auto p-0 md:p-6 flex justify-center items-start">
     
     <!-- CONTENEDOR PRINCIPAL FLOTANTE DE BOTONES -->
@@ -605,11 +642,11 @@
       <button onclick="cerrarVistaPreviaModal()" class="bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg transition border">✕ Cerrar</button>
     </div>
 
-    <!-- HOJA TIPO CARTA REAL CON MARGEN DE 1 CM (aprox 40px / p-10) -->
-    <div class="bg-white w-full max-w-3xl min-h-[1056px] p-[40px] my-4 md:my-8 shadow-2xl relative text-slate-800 font-arial" id="planilla-imprimible">
+    <!-- HOJA TIPO CARTA REAL CON MARGEN PERIMETRAL -->
+    <div class="bg-white w-full max-w-3xl min-h-[1056px] p-[40px] my-4 md:my-8 shadow-2xl relative text-slate-800 font-arial overflow-hidden" id="planilla-imprimible">
       
       <!-- CABECERA INSTITUCIONAL O ESTÁNDAR -->
-      <div id="pdf-header-container" class="pb-4 mb-6 border-b-2" style="border-color: #042050;">
+      <div id="pdf-header-container" class="pb-3 mb-4 border-b-2" style="border-color: #042050;">
         
         <!-- CASO A: LOGO IZQUIERDA Y MEMBRETE CENTRADO -->
         <div id="pdf-header-institucional" class="hidden relative flex items-center min-h-[60px]">
@@ -642,6 +679,12 @@
 
       </div>
 
+      <!-- TÍTULO PRINCIPAL DESTACADO EN MAYÚSCULAS -->
+      <div class="text-center my-4">
+        <h2 id="pdf-titulo-estudio" class="text-sm font-black tracking-wide text-slate-900 font-arial uppercase">INFORME DE ECOGRAFÍA</h2>
+      </div>
+
+      <!-- DATOS DEL PACIENTE -->
       <div class="grid grid-cols-2 gap-2 text-xs border p-3 rounded-lg bg-slate-50 mb-4 font-arial">
         <p><strong>Paciente:</strong> <span id="pdf-nombre"></span></p>
         <p><strong>Cédula:</strong> <span id="pdf-cedula"></span></p>
@@ -656,26 +699,31 @@
         <div id="pdf-transductor"></div>
       </div>
 
+      <!-- HALLAZGOS -->
       <div class="mb-4">
         <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Hallazgos Ecográficos</h3>
         <div id="pdf-hallazgos" class="text-xs leading-relaxed text-slate-700 font-arial"></div>
       </div>
 
+      <!-- OBSERVACIONES -->
       <div id="pdf-container-obs" class="mb-4 hidden">
         <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Observaciones</h3>
         <p id="pdf-observaciones" class="text-xs text-slate-700 font-arial"></p>
       </div>
 
+      <!-- CONCLUSIÓN -->
       <div class="mb-4">
         <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-2">Conclusión Diagnóstica</h3>
         <div id="pdf-conclusion" class="text-xs font-bold text-slate-900 font-arial"></div>
       </div>
 
+      <!-- NOTA -->
       <div id="pdf-container-nota" class="mb-6 hidden">
         <h3 class="text-xs font-bold uppercase text-ecopraxDark border-b pb-1 mb-1">Nota</h3>
         <p id="pdf-nota" class="text-xs italic text-slate-600 font-arial"></p>
       </div>
 
+      <!-- FIRMA Y SELLO -->
       <div class="flex justify-between items-end mt-12 pt-4">
         <div class="text-center w-40">
           <img id="pdf-img-sello" src="" class="max-h-20 mx-auto mb-1 hidden object-contain" alt="Sello">
@@ -688,16 +736,6 @@
       </div>
     </div>
   </div>
-
-  <style>
-    @media print {
-      body * { visibility: hidden; }
-      #modal-preview, #modal-preview * { visibility: visible; }
-      #modal-preview { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white !important; padding: 0 !important; }
-      #modal-action-buttons { display: none !important; }
-      #planilla-imprimible { box-shadow: none !important; margin: 0 !important; width: 100% !important; padding: 20px !important; }
-    }
-  </style>
 
   <!-- LÓGICA JAVASCRIPT & FIREBASE -->
   <script type="module">
@@ -1168,6 +1206,11 @@
       document.getElementById('pdf-telefono').innerText = item.pacienteTelefono || 'N/A';
       document.getElementById('pdf-fecha').innerText = item.fechaStr;
       document.getElementById('pdf-estudio').innerText = item.estudioTipo;
+      
+      // Asignar el título en mayúsculas (Ej: INFORME DE ECOGRAFÍA ABDOMINAL)
+      const nombreEstudioMayus = (item.estudioTipo || 'ECOGRAFÍA').toUpperCase();
+      document.getElementById('pdf-titulo-estudio').innerText = `INFORME DE ${nombreEstudioMayus}`;
+
       document.getElementById('pdf-transductor').innerHTML = item.transductor || '';
       document.getElementById('pdf-hallazgos').innerHTML = item.hallazgos;
       document.getElementById('pdf-conclusion').innerHTML = item.conclusion;
@@ -1277,7 +1320,7 @@
         cargarRegistros(user.uid);
       }
 
-      // Nombre del archivo PDF exacto: NOMBRE_APELLIDO_CEDULA.pdf (en mayúsculas/minúsculas limpias)
+      // Nombre del archivo PDF exacto: NOMBRE_APELLIDO_CEDULA.pdf
       const nombreLimpioNom = nom.toUpperCase().replace(/\s+/g, '_');
       const nombreLimpioApe = ape.toUpperCase().replace(/\s+/g, '_');
       const cedulaLimpia = ced.replace(/[^a-zA-Z0-9]/g, '');
