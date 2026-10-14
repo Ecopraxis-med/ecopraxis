@@ -475,24 +475,37 @@
         <p class="text-xs text-slate-500 mb-6">Personaliza las plantillas por estudio, cabecera institucional (membrete) y diseño general.</p>
         
         <div class="space-y-6">
-          <!-- CABECERA INSTITUCIONAL Y MEMBRETE MULTILÍNEAS -->
-          <div class="border p-4 rounded-xl bg-slate-50 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-ecopraxDark">Cabecera y Membrete Institucional (Opcional)</h3>
-            <p class="text-[11px] text-slate-500">Si configuras un logo institucional, el logo aparecerá a la izquierda y el membrete centrado, reemplazando el encabezado de Ecopraxis.</p>
-            
-            <div class="flex items-center gap-4">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Logo Institucional</label>
-                <input type="file" id="file-logo-institucion" accept="image/*" class="text-xs">
-              </div>
-              <img id="preview-logo-institucion" src="" class="h-12 hidden object-contain border p-1 bg-white rounded" alt="Logo Inst">
-            </div>
+         <!-- CABECERA INSTITUCIONAL Y MEMBRETE MULTILÍNEAS -->
+<div class="border p-4 rounded-xl bg-slate-50 space-y-3">
+  <h3 class="text-xs font-bold uppercase text-ecopraxDark">Cabecera y Membrete Institucional (Opcional)</h3>
+  <p class="text-[11px] text-slate-500">Si configuras un logo institucional, el logo aparecerá a la izquierda y el membrete centrado, reemplazando el encabezado de Ecopraxis.</p>
+  
+  <div class="flex items-center gap-4">
+    <div>
+      <label class="block text-xs font-bold text-slate-700 mb-1">Logo Institucional</label>
+      <input type="file" id="file-logo-institucion" accept="image/*" class="text-xs">
+    </div>
+    <img id="preview-logo-institucion" src="" class="h-12 hidden object-contain border p-1 bg-white rounded" alt="Logo Inst">
+  </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Membrete Multilíneas (Nombre de la clínica, dirección, RIF, etc.)</label>
-              <textarea id="config-membrete-texto" placeholder="Ej: CENTRO CLÍNICO SAN RAFAEL&#10;Av. Principal, Edif. Salud, Piso 1&#10;RIF: J-12345678-9" class="w-full p-3 border rounded-xl text-xs bg-white h-24 outline-none font-arial text-center"></textarea>
-            </div>
-          </div>
+  <div>
+    <div class="flex justify-between items-center mb-1">
+      <label class="block text-xs font-bold text-slate-700 uppercase">Membrete Multilíneas (Nombre de la clínica, dirección, RIF, etc.)</label>
+      <div class="flex items-center gap-1 bg-white p-1 rounded-lg border">
+        <button type="button" onclick="ejecutarComandoCustom('config-membrete-texto', 'bold')" class="w-6 h-6 font-bold bg-slate-50 border rounded text-xs"><b>N</b></button>
+        <button type="button" onclick="ejecutarComandoCustom('config-membrete-texto', 'italic')" class="w-6 h-6 italic bg-slate-50 border rounded text-xs"><i>K</i></button>
+        <button type="button" onclick="ejecutarComandoCustom('config-membrete-texto', 'insertUnorderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">☰•</button>
+        <button type="button" onclick="ejecutarComandoCustom('config-membrete-texto', 'insertOrderedList')" class="w-6 h-6 bg-slate-50 border rounded text-xs font-bold">1.</button>
+        <select onchange="cambiarCasoCustom('config-membrete-texto', this)" class="h-6 px-1 text-[10px] font-bold bg-slate-50 border rounded text-ecopraxBlue">
+          <option value="" disabled selected>AA ▾</option>
+          <option value="mayus">MAYÚS</option>
+          <option value="minus">minús</option>
+        </select>
+      </div>
+    </div>
+    <div id="config-membrete-texto" contenteditable="true" class="editor-clinico w-full p-3 border rounded-xl text-xs bg-white outline-none font-arial text-center" style="min-height: 80px; max-height: 150px;"></div>
+  </div>
+</div>
 
           <!-- PLANTILLAS POR ESTUDIO -->
           <div class="border p-4 rounded-xl bg-slate-50 space-y-4">
@@ -950,7 +963,7 @@
 
     window.guardarConfiguracionReporteGeneral = async function() {
       const colorLinea = document.getElementById('input-color-linea').value;
-      const membreteTexto = document.getElementById('config-membrete-texto').value;
+      const membreteTexto = document.getElementById('config-membrete-texto').innerHTML;
       const fileLogoInst = document.getElementById('file-logo-institucion').files[0];
 
       let logoInstUrl = medicoActualDatos.logoInstUrl || '';
@@ -1279,8 +1292,8 @@
         headerStandard.classList.add('hidden');
         imgInst.src = medicoActualDatos.logoInstUrl;
         imgInst.classList.remove('hidden');
-
-        document.getElementById('pdf-membrete-texto').innerText = medicoActualDatos.membreteTexto || '';
+document.getElementById('pdf-membrete-texto').innerHTML = medicoActualDatos.membreteTexto || '';
+        
         document.getElementById('pdf-medico-nombre-inst').innerText = medicoActualDatos.nombre || 'Dr.';
         document.getElementById('pdf-medico-mpps-inst').innerText = medicoActualDatos.mpps ? `MPPS: ${medicoActualDatos.mpps}` : '';
         document.getElementById('pdf-medico-cmv-inst').innerText = (medicoActualDatos.tieneColegiado && medicoActualDatos.cmv) ? `| CMV: ${medicoActualDatos.cmv}` : '';
@@ -1551,7 +1564,7 @@
               document.getElementById('label-color-val').innerText = medicoActualDatos.colorLinea;
             }
             if (medicoActualDatos.membreteTexto) {
-              document.getElementById('config-membrete-texto').value = medicoActualDatos.membreteTexto;
+  document.getElementById('config-membrete-texto').innerHTML = medicoActualDatos.membreteTexto;
             }
 
             cargarPlantillaEnEditorConfig();
